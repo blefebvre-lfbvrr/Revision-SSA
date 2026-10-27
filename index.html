@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Révision SSA</title>
+<meta name="description" content="Quiz de révision du Surveillant Sauveteur Aquatique (SSA) : questions par chapitre, examen blanc et suivi de la progression.">
+<meta name="theme-color" content="#EAF0F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A1A25" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Révision SSA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Mise en page : une colonne étroite type appli mobile, un écran = une action.
+   Palette : carrelage de piscine (fond), bleu de bassin (action), et le code des drapeaux de plage
+   (vert / jaune / rouge) réservé à l'état des réponses et de la maîtrise. */
+:root {
+  --bg: #EAF0F3;
+  --surface: #FFFFFF;
+  --ink: #0E2A3B;
+  --muted: #587384;
+  --line: #CFDBE2;
+  --accent: #0B5C8C;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #D9E9F2;
+  --green: #1C8A58;
+  --green-bg: #DDF3E8;
+  --yellow: #E3A900;
+  --yellow-bg: #FFF1C2;
+  --red: #CF3A2A;
+  --red-bg: #FBE1DC;
+  --f-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A1A25; --surface: #12283A; --ink: #E5F0F6; --muted: #8FAABB; --line: #25445A;
+    --accent: #56B6EA; --accent-ink: #062132; --accent-soft: #163B52;
+    --green: #4CC38B; --green-bg: #12382A; --yellow: #F2C23D; --yellow-bg: #3A3010;
+    --red: #FF7C69; --red-bg: #43211C; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A1A25; --surface: #12283A; --ink: #E5F0F6; --muted: #8FAABB; --line: #25445A;
+  --accent: #56B6EA; --accent-ink: #062132; --accent-soft: #163B52;
+  --green: #4CC38B; --green-bg: #12382A; --yellow: #F2C23D; --yellow-bg: #3A3010;
+  --red: #FF7C69; --red-bg: #43211C; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  min-height: 100%;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 640px; margin: 0 auto; padding-block: 12px 28px; }
+
+/* Bandeau double rouge/jaune du poste de secours */
+.band { display: grid; grid-template-rows: 5px 5px; border-radius: 2px; overflow: hidden; margin-bottom: 14px; }
+.band i:first-child { background: var(--red); }
+.band i:last-child { background: var(--yellow); }
+
+header.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: 40px; line-height: 0.95; letter-spacing: 0.02em; text-transform: uppercase; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.mastery { text-align: right; flex: none; }
+.mastery b { font-family: var(--f-display); font-size: 34px; line-height: 1; display: block; font-variant-numeric: tabular-nums; }
+.mastery span { font-size: 12px; color: var(--muted); }
+
+.stack { display: flex; flex-direction: column; gap: 12px; }
+.hero {
+  background: var(--accent); color: var(--accent-ink); border-radius: 14px; padding: 18px;
+  display: flex; align-items: center; gap: 14px; justify-content: space-between; flex-wrap: wrap;
+}
+.hero h2 { font-family: var(--f-display); font-size: 26px; text-transform: uppercase; letter-spacing: 0.03em; margin: 0; line-height: 1.05; }
+.hero p { margin: 4px 0 0; font-size: 14px; opacity: .92; max-width: 30ch; }
+.btn-inv { background: var(--accent-ink); color: var(--accent); border: 0; border-radius: 10px; padding: 14px 22px; font-weight: 600; font-size: 17px; min-height: 48px; }
+:root[data-theme="dark"] .btn-inv { color: var(--accent-ink); background: var(--ink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-inv { color: var(--accent-ink); background: var(--ink); } }
+
+.resume { background: var(--yellow-bg); border: 1px solid var(--yellow); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.resume b { font-weight: 600; }
+.btn { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; min-height: 52px; font-weight: 600; text-align: left; display: flex; flex-direction: column; gap: 2px; }
+.btn small { font-weight: 400; color: var(--muted); font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.small { min-height: 44px; padding: 10px 14px; flex-direction: row; align-items: center; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.label { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 12px 0 0; }
+
+.chrow { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.chmain { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px; display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; text-align: left; min-width: 0; }
+.chnum { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1; width: 44px; height: 44px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 8px; }
+.chtxt { min-width: 0; }
+.chtxt b { display: block; font-weight: 600; line-height: 1.2; }
+.chtxt span { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.bar > i { display: block; height: 100%; background: var(--green); border-radius: 3px; }
+.chall { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 12px; min-width: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: var(--muted); }
+.chall b { font-family: var(--f-display); font-size: 22px; color: var(--ink); line-height: 1; }
+
+footer.foot { margin-top: 22px; color: var(--muted); font-size: 13px; display: flex; flex-direction: column; gap: 10px; }
+.linkbtn { background: none; border: 0; padding: 8px 0; color: var(--muted); text-decoration: underline; text-align: left; min-height: 40px; }
+.confirm { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+/* Quiz */
+.qtop { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.qtop .linkbtn { text-decoration: none; font-weight: 600; color: var(--accent); padding: 8px 0; }
+.count { font-family: var(--f-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.prog { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; margin-bottom: 16px; }
+.prog i { height: 6px; border-radius: 3px; background: var(--line); }
+.prog i.ok { background: var(--green); }
+.prog i.ko { background: var(--red); }
+.prog i.now { background: var(--accent); }
+.chip { display: inline-block; font-family: var(--f-mono); font-size: 12px; background: var(--accent-soft); color: var(--ink); padding: 3px 8px; border-radius: 6px; letter-spacing: .04em; }
+.question { font-weight: 600; font-size: 21px; line-height: 1.3; margin: 12px 0 16px; text-wrap: pretty; }
+.opts { display: flex; flex-direction: column; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.opt { width: 100%; background: var(--surface); border: 2px solid var(--line); border-radius: 12px; padding: 12px; min-height: 56px; display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: start; text-align: left; }
+.opt .k { font-family: var(--f-mono); font-size: 14px; width: 28px; height: 28px; border-radius: 7px; background: var(--accent-soft); display: grid; place-items: center; }
+.opt:hover:not(:disabled) { border-color: var(--accent); }
+.opt:disabled { cursor: default; }
+.opt.good { border-color: var(--green); background: var(--green-bg); }
+.opt.good .k { background: var(--green); color: #fff; }
+.opt.bad { border-color: var(--red); background: var(--red-bg); }
+.opt.bad .k { background: var(--red); color: #fff; }
+.opt.dim { opacity: .6; }
+.fb { margin-top: 16px; border-radius: 12px; padding: 14px; border: 1.5px solid; }
+.fb.good { background: var(--green-bg); border-color: var(--green); }
+.fb.bad { background: var(--red-bg); border-color: var(--red); }
+.fb h3 { display: flex; align-items: center; gap: 8px; font-family: var(--f-display); font-size: 22px; text-transform: uppercase; letter-spacing: .03em; margin: 0 0 6px; }
+.fb p { margin: 0 0 8px; }
+.fb .ref { font-size: 13px; color: var(--muted); }
+.fb .ref .chip { margin-right: 6px; }
+.flag { fill: currentColor; flex: none; }
+.bottom {
+  position: sticky; bottom: 0; background: var(--bg); margin-top: 16px;
+  padding-top: 10px; padding-bottom: 10px; box-shadow: 0 -10px 12px -8px var(--bg);
+}
+.next { width: 100%; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; padding: 15px; font-weight: 600; font-size: 17px; min-height: 52px; }
+.hint { text-align: center; font-size: 12px; color: var(--muted); margin-top: 6px; }
+@media (pointer: coarse) { .hint { display: none; } }
+
+/* Résultat */
+.score { text-align: center; padding: 22px 12px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; }
+.score .big { font-family: var(--f-display); font-weight: 700; font-size: 72px; line-height: 1; font-variant-numeric: tabular-nums; }
+.score .verdict { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-display); font-size: 24px; text-transform: uppercase; letter-spacing: .04em; margin-top: 6px; }
+.score .v-green { color: var(--green); } .score .v-yellow { color: var(--yellow); } .score .v-red { color: var(--red); }
+.score p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+.miss { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.miss .q { font-weight: 600; margin: 6px 0 6px; }
+.miss .a { color: var(--green); font-weight: 500; margin: 0 0 4px; }
+.miss .e { font-size: 14px; color: var(--muted); margin: 0; }
+.empty { color: var(--muted); text-align: center; padding: 8px; }
+@media (max-width: 380px) { h1 { font-size: 34px; } .question { font-size: 19px; } .grid2 { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: no-preference) { .opt, .btn, .next { transition: border-color .12s, background-color .12s; } }
+
+/* Sauvegarde */
+.save { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; color: var(--ink); }
+.save .st { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; }
+.save .st::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: var(--green); }
+.save .st.warn::before { background: var(--red); }
+.save .tip { font-size: 13px; color: var(--muted); margin: 0; }
+.save .msg { font-size: 14px; margin: 0; }
+.save .msg.bad { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="band" aria-hidden="true"><i></i><i></i></div>
+  <main id="app"></main>
+</div>
+
+<script>
+// [chapitre, fiche, question, BONNE réponse, faux 1, faux 2, faux 3, explication]
+const RAW = [
+// ───────── Chapitre 1 : Situer son rôle et sa mission
+[1,"01AC01","Quels sont les trois milieux dans lesquels la fonction de SSA peut s'exercer ?","Artificiel, littoral et eaux intérieures","Piscine, mer et montagne","Artificiel, maritime et souterrain","Public, privé et associatif","Milieu artificiel (piscine, bassins flottants aménagés), littoral (plages aménagées et surveillées) et eaux intérieures (plan d'eau, lac, rivière)."],
+[1,"01AC01","Quel article du Code du sport définit les établissements de baignade d'accès payant, cible essentielle de la formation SSA ?","D322-12","D322-13","A322-8","L322-1","L'article D322-12 vise les accès payants. L'article D322-13 concerne les baignades ouvertes gratuitement au public (objectif supplémentaire de la formation)."],
+[1,"01AC01","Quelle qualification de secourisme faut-il pour entrer en formation SSA Littoral ou Eaux intérieures ?","Le PSE2 (ou équivalent)","Le PSC1","Le PSE1 seul","Le SST","Il faut aussi un certificat médical valide et l'un des diplômes MNS, BNSSA ou SSA (ou une formation en cours pour l'un d'eux)."],
+[1, "01AC01", "Un candidat dont la formation PSE2 est encore en cours peut-il suivre une formation SSA Littoral ou Eaux intérieures ?", "Oui, mais le certificat n'est délivré qu'une fois toutes les conditions réunies (PSE2 + MNS ou SSA)", "Non, le PSE2 doit impérativement être obtenu avant toute inscription à la formation", "Oui, et le certificat est délivré dès la fin de la formation, sans autre condition", "Non, cette formation complémentaire est strictement réservée aux seuls maîtres-nageurs", "Les candidats avec PSE2 ou SSA/MNS en cours sont acceptés, mais le certificat de compétences attend l'ensemble des conditions."],
+[1, "01AC01", "Saint-Julien-en-Born (Dax, 2012) : pourquoi la commune est-elle considérée comme principale entité fautive ?", "Elle n'avait pas vérifié la compétence des sauveteurs (défaut de formation d'adaptation à l'emploi)", "Elle avait interdit aux sauveteurs d'utiliser le matériel de sauvetage disponible sur la plage", "Elle avait recruté un nombre excessif de sauveteurs sans coordination entre eux", "Elle n'avait déposé aucun plan d'organisation de la surveillance en préfecture", "La commune a failli à son obligation de surveillance efficace de la zone de baignade et n'a pas contrôlé la compétence des sauveteurs."],
+[1,"01AC01","Quel matériel de sauvetage est spécifique au milieu naturel ?","Le Paddle Rescue et le filin","La bouée tube","Le plan dur","La perche","La formation en milieu naturel apprend à maîtriser du matériel dont le SSA n'a pas l'usage en milieu artificiel."],
+
+[1,"01AC02","La responsabilité civile du SSA repose sur trois éléments. Lesquels ?","Une faute, un dommage et un lien de causalité","Une faute, une peine et une amende","Un danger, une victime et un témoin","Une intention, un dommage et un jugement","Faute (inattention, manquement, intervention inadaptée), dommage (blessure, noyade…) et lien de causalité entre les deux."],
+[1,"01AC02","Quel est l'objectif de la responsabilité civile ?","Réparer le dommage subi par la victime","Punir l'auteur de la faute","Protéger la société","Sanctionner disciplinairement l'agent","La responsabilité civile répare, elle ne punit pas. C'est la responsabilité pénale qui sanctionne."],
+[1,"01AC02","La responsabilité pénale d'un SSA peut-elle être transférée à son employeur ?","Non, elle est toujours personnelle","Oui, s'il est salarié","Oui, si l'employeur est une commune","Oui, si le SSA est assuré","Elle est toujours personnelle. L'employeur ne peut pas « protéger » un SSA qui commet une infraction grave et se porte le plus souvent partie civile."],
+[1,"01AC02","Peine encourue pour homicide involontaire par faute simple ?","3 ans d'emprisonnement et 45 000 € d'amende","2 ans et 30 000 €","5 ans et 75 000 €","1 an et 15 000 €","Faute simple : 3 ans et 45 000 €. Violation manifestement délibérée d'une obligation particulière de sécurité : 5 ans et 75 000 €."],
+[1,"01AC02","Peine encourue pour homicide involontaire par violation manifestement délibérée d'une obligation particulière de sécurité ?","5 ans d'emprisonnement et 75 000 € d'amende","3 ans et 45 000 €","2 ans et 30 000 €","7 ans et 100 000 €","Exemple : non-respect volontaire d'un protocole essentiel."],
+[1,"01AC02","Blessures involontaires avec ITT supérieure à 3 mois, par faute simple : quelle peine ?","2 ans d'emprisonnement et 30 000 € d'amende","3 ans et 45 000 €","1 an et 15 000 €","5 ans et 75 000 €","Pour une violation manifestement délibérée d'une obligation de sécurité : 3 ans et 45 000 €."],
+[1,"01AC02","Quelle peine encourt-on pour non-assistance à personne en danger ?","5 ans d'emprisonnement et 75 000 € d'amende","1 an et 15 000 €","3 ans et 45 000 €","2 ans et 30 000 €","Si la victime est un mineur de moins de 16 ans : 7 ans d'emprisonnement et 100 000 €."],
+[1,"01AC02","Quelle peine encourt-on pour mise en danger délibérée de la vie d'autrui ?","1 an d'emprisonnement et 15 000 € d'amende","5 ans et 75 000 €","3 ans et 45 000 €","6 mois et 7 500 €","Elle vise un manquement grave exposant quelqu'un à un risque immédiat de mort ou de blessures graves."],
+[1, "01AC02", "Piscine de la Pointe Rouge (2011) : quel comportement des surveillants a été mis en évidence lors de la noyade d'une fillette de 4 ans ?", "L'usage de leurs téléphones portables (SMS, connexion internet)", "L'absence totale de surveillants sur le bassin pendant toute la durée de la noyade", "Un défaut de matériel de réanimation et d'oxygénothérapie au poste de secours", "Une ouverture tardive de l'établissement au public ce jour-là", "Trois surveillants ont utilisé leur téléphone entre 17 h et 18 h 10. Jugement du 29 juin 2018 pour homicide involontaire (dysfonctionnement sécuritaire majeur)."],
+[1, "01AC02", "Pourquoi une assurance professionnelle « défense et recours » est-elle indispensable au SSA ?", "La responsabilité pénale est personnelle : avocat et experts restent à sa charge", "L'employeur n'est jamais assuré, donc le SSA doit couvrir seul tous les risques", "Elle remplace le POSS et dispense l'exploitant de toute obligation de sécurité", "Elle est exigée par le Code du sport pour pouvoir s'inscrire à la formation SSA", "Sans assurance professionnelle, le SSA supporte intégralement le préjudice et les frais de justice."],
+[1, "01AC02", "Qui prend en général en charge la responsabilité civile du SSA dans le cadre professionnel ?", "L'employeur (commune, structure gestionnaire, association)", "Le SSA lui-même, sur ses biens personnels dans tous les cas", "Le préfet de département, au titre de la police administrative", "La victime elle-même, au titre de l'imprudence du baigneur", "Le SSA peut toutefois être poursuivi personnellement en cas de faute intentionnelle ou d'une particulière gravité."],
+[1,"01AC02","Jusqu'à quelle distance de la limite des eaux s'étend le pouvoir de police spéciale du maire sur les baignades (loi littoral de 1986) ?","300 mètres","100 mètres","500 mètres","1 mille nautique","Au-delà de la limite des eaux et jusqu'à 300 m, le maire exerce la police des baignades et des activités nautiques."],
+[1, "01AC02", "Contis-Plage (1993) : quelle faute a engagé la responsabilité de la commune ?", "Une faute d'organisation de la prévention des risques (maîtres-nageurs non formés aux baïnes, baigneurs non informés)", "Un défaut d'entretien du poste de secours et du matériel de signalisation de la plage", "L'absence de drapeau vert hissé pendant la baignade des victimes", "Un effectif de sauveteurs insuffisant pour surveiller toute la zone de baignade", "La zone de baignade avait été déplacée près d'une baïne dangereuse par méconnaissance des courants d'arrachement."],
+[1,"01AC02","Quel document l'employeur doit-il établir pour évaluer les risques professionnels de ses agents ?","Le DUERP","Le POSS","La main courante","Le carnet sanitaire","Document unique d'évaluation des risques professionnels, obligation du Code du travail."],
+[1,"01AC02","Laquelle de ces obligations incombe au SSA (et non à l'employeur) selon le Code du travail ?","Porter une tenue adaptée et identifiable","Fournir du matériel de secours opérationnel","Former les agents aux gestes de secours","Évaluer les risques dans le DUERP","Le SSA respecte aussi les consignes, utilise le matériel fourni, signale tout danger et ne se comporte pas de manière dangereuse."],
+[1, "01AC02", "Qui doit faire la déclaration d'exercice auprès de l'autorité administrative ?", "Les titulaires du SSA qui surveillent un établissement de baignade d'accès payant", "Tous les baigneurs d'un établissement payant avant leur première entrée", "Uniquement les maires des communes qui exploitent une baignade aménagée", "Les SSA bénévoles intervenant dans une piscine privée familiale", "Le Code du sport impose aussi cette déclaration à ceux qui enseignent, animent, entraînent ou encadrent contre rémunération."],
+[1,"01AC02","Quel code impose une obligation de sécurité aux exploitants de piscines sans obligation de surveillance (campings, copropriétés) ?","Le Code de la consommation","Le Code de l'éducation","Le Code de la route","Le Code électoral","Produits et services doivent présenter la sécurité à laquelle on peut légitimement s'attendre."],
+
+[1, "01AC03", "Quel est le rôle du SSA dans la chaîne des secours ?", "Protéger, alerter, secourir, guider les moyens engagés et transmettre les informations utiles", "Diriger les opérations de secours à la place du commandant des opérations de secours", "Remplacer le SAMU sur place pour assurer la régulation médicale des appels", "Assurer uniquement la surveillance, sans transmettre d'information aux secours publics", "Le SSA est un maillon essentiel et un interlocuteur privilégié qui facilite l'action du COS."],
+[1,"01AC03","Qui assure la direction des opérations de secours (DOS) selon l'ampleur de l'événement ?","Le maire ou le préfet","Le COS","Le chef de poste du SSA","Le directeur du SAMU","Sur le terrain, la conduite opérationnelle revient au COS, désigné au sein des services d'incendie et de secours."],
+[1,"01AC03","Qui coordonne les opérations de secours et de sauvetage en mer ?","Le préfet maritime, avec le CROSS","Le maire de la commune riveraine","Le SDIS seul","Le préfet de département","Les CROSS restent responsables en toutes circonstances des opérations de secours en mer."],
+[1,"01AC03","Qui décide d'engager un hélicoptère Hélismur ?","Le SAMU","Le maire","Le SSA présent","Le préfet maritime","Hélismur est engagé sur décision du SAMU pour une prise en charge médicalisée rapide (site difficile d'accès ou éloigné)."],
+[1, "01AC03", "À quoi sert un dispositif prévisionnel de secours (DPS) ?", "Prépositionner des moyens humains et matériels lors d'un événement à risque pour le public", "Remplacer le POSS d'une piscine et dispenser l'exploitant de toute surveillance", "Définir chaque année les zones de baignade surveillées du littoral communal", "Former les SSA à l'accueil du public et à la gestion des conflits", "Exemples : compétition de natation, triathlon, course en eau libre. Il est dirigé par un chef de dispositif."],
+[1, "01AC03", "Dans quelle zone le SSA, sous l'autorité du maire, met-il en œuvre les mesures d'assistance et de secours ?", "Dans la zone de surveillance définie par arrêté", "Dans toute la bande des 300 mètres à partir du rivage", "Sur tout le littoral de la commune, plages non surveillées comprises", "Uniquement sur la partie sèche de la plage", "Pas dans l'intégralité de la bande des 300 m : seulement dans la zone de surveillance fixée par l'arrêté."],
+[1,"01AC03","Dans le processus d'intervention, quelle mission peut être déléguée à un personnel désigné dans le plan de secours (hors SSA) ?","Transmettre l'alerte aux secours","Mettre en œuvre la technique de sauvetage","Extraire la victime de l'eau","Appliquer les procédures PSE","Peuvent aussi être déléguées : acheminer le matériel de secours, faciliter l'accès et l'accueil des secours."],
+
+[1,"01AC04","Que signifie un drapeau jaune hissé en haut du mât ?","Baignade surveillée avec danger limité ou marqué","Baignade interdite","Baignade surveillée sans danger apparent","Zone réservée aux nageurs","Rouge : baignade interdite. Vert : baignade surveillée sans danger apparent."],
+[1,"01AC04","Que signifie un drapeau rouge hissé en haut du mât ?","Baignade interdite","Baignade surveillée avec danger limité","Fin de la surveillance","Poste de secours fermé","Jaune : danger limité ou marqué. Vert : sans danger apparent."],
+[1, "01AC04", "Comment est délimitée une zone de baignade surveillée ?", "Entre deux drapeaux identiques bicolores, rouge en haut et jaune en bas", "Entre deux drapeaux verts identiques hissés en haut de deux mâts distincts", "Entre un drapeau rouge et un drapeau jaune de formes différentes", "Par un seul drapeau bleu planté au centre de la zone surveillée", "Décret n° 2022-105 du 31 janvier 2022 et norme AFNOR Spec X50-001 (usage volontaire)."],
+[1, "01AC04", "Comment est identifié le poste de secours selon la norme X50-001 ?", "Bandeau double rouge et jaune, avec « SSA – Lifeguard » en lettres noires sur la partie jaune", "Bandeau bleu avec croix blanche sur le tour complet du poste", "Bandeau vert avec la mention « Secours » écrite en lettres blanches", "Drapeau rouge permanent hissé au sommet du poste de secours", "Le bandeau fait le tour complet de la structure."],
+[1, "01AC04", "Quelles couleurs dominantes sont préconisées pour la tenue du SSA ?", "Jaune en haut (tee-shirt), rouge en bas (short)", "Rouge en haut (tee-shirt), jaune en bas (short)", "Bleu en haut (tee-shirt), blanc en bas (short)", "Vert en haut (tee-shirt), noir en bas (short)", "La tenue doit être clairement identifiable et distinguable de celle de tout autre personnel non affecté à la surveillance."],
+[1,"01AC04","En ACM, en piscine, quel est le taux d'encadrement pour les enfants de moins de 6 ans ?","Un animateur dans l'eau pour 5 enfants","Un pour 8","Un pour 10","Un pour 3","Un animateur pour 8 enfants à partir de 6 ans. L'existence d'un service de surveillance ne décharge pas l'encadrement de sa propre responsabilité."],
+[1,"01AC04","Hors baignade aménagée et surveillée, quelle température minimale de l'eau est exigée pour la baignade d'un ACM ?","18 °C","15 °C","20 °C","22 °C","Le lieu est reconnu à l'avance : profondeur, température, hygiène, ombre, téléphone, accès pour un véhicule de secours."],
+[1,"01AC04","Qui peut surveiller la baignade d'un ACM organisée en autonomie ?","Un MNS, un SSA ou un SB ACM","Uniquement un MNS","Tout animateur BAFA sans qualification","Le directeur de l'ACM seul","Le SB ACM détient un brevet de surveillant de baignade dont les prérogatives ne s'exercent qu'en ACM (emploi saisonnier)."],
+[1, "01AC04", "Île Charlemagne (2024) : quelle faute le tribunal a-t-il retenue contre les sept encadrants ?", "Une faute collective de surveillance (défaut d'organisation, pas de surveillance individualisée)", "Une faute isolée de la directrice, seule responsable de l'organisation de la sortie", "Un défaut de matériel de secours sur la base de loisirs", "L'absence de maître-nageur sur la zone de baignade pendant la sortie", "Les 7 encadrants, dont les 3 SSA, ont été condamnés pour homicide involontaire : fillette de 5 ans, non-nageuse, sans brassards."],
+[1,"01AC04","Pendant la natation scolaire, quel est le rôle du SSA ?","Personnel de secours (surveillance, intervention), pas encadrant","Enseignant responsable de la séance","Encadrant pédagogique","Responsable de la sécurité des élèves à la place de l'enseignant","L'enseignant reste responsable de la séance et garant de la sécurité des élèves."],
+[1,"01AC04","Le SSA peut-il enseigner ou animer des activités aquatiques contre rémunération ?","Non, il n'est pas éducateur sportif","Oui, comme le MNS","Oui, uniquement l'aquagym","Oui, pour les enfants de moins de 8 ans","Peine encourue : jusqu'à 1 an d'emprisonnement et 15 000 € d'amende (BNSSA condamné à Strasbourg en 2022)."],
+[1,"01AC04","Quelle est la fréquentation théorique maximale d'un bassin couvert ?","1 personne par m² de plan d'eau","3 personnes pour 2 m²","2 personnes par m²","1 personne pour 2 m²","Bassin en plein air : 3 personnes pour 2 m². Les pataugeoires et bassins de plongeon ne comptent pas dans la surface."],
+[1, "01AC04", "À partir de quand l'accès est-il considéré comme payant ?", "Dès que l'usager règle un droit d'entrée, même symbolique", "Uniquement lorsque le tarif d'entrée dépasse cinq euros par personne", "Dès que la piscine est exploitée par une commune ou un établissement public", "Dès que l'établissement est situé en bord de mer ou d'un plan d'eau", "L'accès payant implique une obligation renforcée de sécurité : surveillance MNS ou SSA, POSS, matériel aux normes."],
+
+[1,"01AC05","Combien de temps un rapport d'accident doit-il être archivé au minimum ?","5 ans","1 an","2 ans","10 ans","Il est signé, daté, transmis à la hiérarchie et à l'assureur, puis archivé."],
+[1, "01AC05", "Quelle règle essentielle s'applique à la rédaction d'un rapport ou d'une main courante ?", "Décrire ce qui a été vu, entendu et réalisé, sans interprétation ni jugement", "Donner son avis sur les responsabilités de chacun pour orienter l'enquête", "Résumer les faits sans mentionner d'horaires pour rester concis", "Ne consigner que les accidents graves et ignorer les incidents mineurs", "Le rapport doit être objectif, détaillé et chronologique."],
+[1, "01AC05", "Lequel de ces cas est un accident grave à déclarer ?", "Une blessure nécessitant plus de 24 heures d'hospitalisation", "Une égratignure soignée au poste de secours sans suite particulière", "Un enfant perdu retrouvé en cinq minutes près de l'entrée", "Un malaise bénin sans transport vers l'hôpital ni séquelle", "Accident grave : décès, hospitalisation de plus de 24 h ou séquelles importantes et durables. Fiche de signalement EAPS."],
+[1, "01AC05", "Quand consigne-t-on météo, températures de l'eau et de l'air et fréquentation dans la main courante ?", "Avant le début de chaque poste de surveillance", "Uniquement en fin de journée, au moment de la clôture du poste", "Uniquement en cas d'accident ou d'incident", "Une fois par semaine, lors de la réunion d'équipe", "En fin de journée, le SSA clôture le poste : matériel, statistiques du jour, consignes pour le lendemain."],
+[1,"01AC05","Lequel de ces documents est un document de traçabilité ?","La main courante","Le règlement intérieur","L'arrêté municipal","La note de service","Traçabilité : main courante, rapports d'accident, fiches d'intervention."],
+
+[1, "01AC06", "Lequel de ces principes fait partie des trois principes essentiels de la posture du SSA ?", "Obéir de bonne foi aux ordres du chef de poste, bassin ou responsable", "Sanctionner lui-même les usagers qui ne respectent pas le règlement", "Quitter son poste dès qu'un collègue ou un usager le lui demande", "Décider seul de l'évacuation du bassin sans en référer à personne", "Les deux autres : discipline et sécurité, et transmission de toutes les observations à la hiérarchie."],
+[1, "01AC06", "Quand l'usage du téléphone portable est-il autorisé pendant la surveillance ?", "Dans les situations strictement professionnelles ou d'urgence", "Pendant les périodes calmes, quand la fréquentation du bassin est faible", "Quand un autre SSA surveille également la même zone de baignade", "Pendant les rotations de poste, le temps de rejoindre sa nouvelle zone", "Toute distraction est une entrave à la mission et peut engager la responsabilité du SSA."],
+[1, "01AC06", "Face à un groupe agressif et une situation devenue incontrôlable, quelle posture adopter ?", "Se mettre en retrait, mettre les personnes en sécurité et demander les forces de sécurité intérieure (112)", "Maîtriser physiquement l'agresseur pour protéger les usagers présents", "Poursuivre la surveillance sans réagir en attendant que le calme revienne", "Évacuer de force les personnes agressives en dehors de l'établissement", "Le SSA peut protéger et secourir, mais ne peut ni contraindre ni sanctionner comme les forces de l'ordre."],
+[1,"01AC06","Outrage à un agent chargé d'une mission de service public, commis par plusieurs personnes : quelle peine ?","6 mois d'emprisonnement et 7 500 € d'amende","7 500 € d'amende seulement","1 an et 15 000 €","750 € d'amende","Commis par une seule personne : 7 500 € d'amende."],
+[1, "01AC06", "Le secret professionnel (art. 226-13 du Code pénal) exclut-il le devoir d'alerte ?", "Non : en cas de danger pour un usager, le SSA en réfère à sa hiérarchie ou aux autorités", "Oui, il interdit toute transmission d'information, même en cas de danger pour un usager", "Oui, sauf si l'usager concerné a donné son accord écrit à la transmission", "Non, mais cette exception ne vaut que lorsque la victime est un mineur", "Violation du secret professionnel : 1 an d'emprisonnement et 15 000 €. Le principe vaut aussi dans l'espace numérique."],
+[1,"01PR01","Quelle surveillance le SSA assure-t-il pendant l'accueil du public ?","Active, vigilante, permanente et exclusive","Alternée avec l'accueil des usagers","Ponctuelle selon la fréquentation","Passive tant qu'aucun incident n'est signalé","Pendant : accueil courtois, surveillance, prévention, sauvetage si besoin, suivi de la main courante."],
+[1, "01PR01", "Quelle action se réalise après la fréquentation du public ?", "Vérifier l'évacuation, clôturer les documents, reconditionner le matériel", "Vérifier le bon fonctionnement du matériel de communication et de secours", "Renseigner les documents administratifs d'ouverture et accueillir le public", "Effectuer les actions de prévention et assurer le suivi de la main courante", "Avant : normes d'hygiène et de sécurité, matériel de secours et de communication, documents administratifs."],
+
+// ───────── Chapitre 2 : Analyse des risques particuliers
+[2,"02AC01","Quelle plage de pH est prévue pour l'eau des piscines publiques ?","6,9 à 7,7","5,5 à 6,5","7,8 à 8,5","6,0 à 7,0","Le chlore est stabilisé par l'acide isocyanurique."],
+[2,"02AC01","Quelle teneur maximale en acide isocyanurique (stabilisant du chlore) est admise ?","75 mg/l","25 mg/l","150 mg/l","0,4 mg/l","Produit stabilisant du chlore : acide isocyanurique, maximum 75 mg/l."],
+[2,"02AC01","Quelle part de l'épuration de l'eau est assurée par la filtration ?","80 %","50 %","20 %","100 %","Les traitements désinfectants et d'équilibre de l'eau assurent les 20 % restants."],
+[2,"02AC01","Quel renouvellement journalier en eau prévoient les textes depuis 2022 ?","30 litres par baigneur","10 litres par baigneur","50 litres par baigneur","1 m³ par bassin","Aussi : produits de désinfection d'une liste ministérielle, vidange complète si analyses défavorables, pédiluves et douche obligatoires."],
+[2,"02AC01","Quelle étape du circuit du baigneur élimine jusqu'à 60 à 80 % des pollutions organiques ?","La douche savonnée","Le pédiluve","Le déchaussage","Le simple rinçage","Un simple rinçage est insuffisant. Ordre : zone sèche → zone humide, déchaussage, vestiaires, douche savonnée, pédiluve, bassin."],
+[2,"02AC01","Dans le circuit du baigneur, quelle étape précède immédiatement l'accès au bassin ?","Le pédiluve","La douche savonnée","Le passage aux vestiaires","Le déchaussage","Le pédiluve est un court passage qui désinfecte les pieds avant l'accès aux plages."],
+[2, "02AC01", "À quelle fréquence minimale le personnel relève-t-il température, pH, chlore et transparence en piscine publique ?", "Au moins deux fois par jour, notés dans le carnet sanitaire", "Une fois par semaine, avec un relevé dans le carnet sanitaire", "Une fois par mois, par un laboratoire agréé uniquement", "À chaque entrée de baigneur, notée dans le carnet sanitaire", "Un laboratoire agréé fait un contrôle sanitaire mensuel. L'affichage des résultats est obligatoire."],
+[2, "02AC01", "Comment se forment les chloramines en piscine couverte ?", "Par réaction du chlore avec les matières azotées des baigneurs (sueur, urine, cosmétiques)", "Par réaction du chlore avec le calcaire contenu dans l'eau du bassin", "Par évaporation de l'acide isocyanurique sous l'effet de la chaleur", "Par condensation de l'humidité sur les vitrages et les parois du bassin", "Volatiles, elles s'accumulent dans l'air et irritent les yeux et les voies respiratoires."],
+[2, "02AC01", "Taux élevé de chloramines ou symptômes chez les usagers : quelle mesure prioritaire ?", "Renforcer la ventilation (centrale d'air, portes, fenêtres)", "Augmenter immédiatement la dose de chlore dans le bassin", "Maintenir la fréquentation en attendant la fin de la journée", "Vider immédiatement le bassin et renvoyer tous les usagers", "On réduit ou suspend la fréquentation si besoin, l'exploitant corrige le traitement de l'eau et renouvelle partiellement l'eau."],
+[2,"02AC01","En milieu naturel, à quelle fréquence un laboratoire agréé fait-il le contrôle sanitaire de l'eau de baignade ?","Deux fois par mois","Une fois par an","Tous les jours","Une fois par semaine","Chaque jour, le SSA surveille température, turbidité, couleur, mousses, huiles, algues, méduses, cyanobactéries et odeurs."],
+[2,"02AC01","Quels sont les quatre classements annuels de l'eau de baignade en milieu naturel ?","Excellente, bonne, suffisante, insuffisante","Verte, jaune, orange, rouge","A, B, C, D","Conforme, tolérée, limite, interdite","Le résultat est affiché obligatoirement au poste de secours."],
+[2,"02AC02","Quelle est la plage horaire du pic UV, qui expose le SSA ?","Entre 11 h et 17 h","Entre 8 h et 10 h","Entre 17 h et 20 h","Entre 6 h et 9 h","Facteurs aggravants : réverbération sur l'eau, le sable ou les dalles claires, peu d'ombre, peau très exposée."],
+[2, "02AC02", "Quelle protection individuelle est recommandée contre le soleil ?", "Crème indice 50+ renouvelée toutes les 2 heures", "Crème indice 30 appliquée une fois le matin", "Crème indice 50+ appliquée une seule fois par jour", "Aucune crème n'est nécessaire sous une casquette", "Aussi : surveillance dermatologique, auto-examen de la peau, signalement précoce de toute lésion suspecte."],
+[2, "02AC02", "Accident au chlore : que faire concernant la ventilation ?", "Ventiler si possible sans s'exposer, jamais sans protection respiratoire", "Entrer dans le local pour couper l'arrivée de chlore à la source", "Fermer toutes les ouvertures pour confiner les vapeurs dans le local", "Ventiler en restant sur place, sans protection, pour accélérer l'évacuation", "CAT : évacuer et mettre en sécurité, appeler le 112, ventiler, gestes de secours si détresse respiratoire. Les symptômes peuvent s'aggraver plusieurs heures après."],
+[2,"02AC02","Quelle atteinte caractérise une exposition grave aux vapeurs de chlore ?","Œdème pulmonaire aigu","Simple irritation des yeux","Céphalées légères","Rougeur cutanée","Exposition grave : œdème pulmonaire aigu, détresse respiratoire, perte de connaissance, arrêt respiratoire."],
+[2, "02AC02", "Que sont les « puces de canard » ?", "Une dermatite d'origine parasitaire en milieu naturel", "Des insectes piqueurs présents sur les plages", "Une algue toxique du littoral", "Une réaction allergique à la piqûre de méduse", "Parmi les réactions possibles en milieu naturel avec les algues, cyanobactéries, plancton et faune aquatique."],
+[2, "02AC03", "Quel danger menace un nageur après une apnée prolongée ?", "Une perte de connaissance brutale (syncope d'apnée) due à l'hypoxie", "Une simple fatigue musculaire, sans conséquence sur la conscience du nageur", "Une hypothermie rapide liée à la durée de l'immersion en eau", "Une crampe musculaire qui l'empêche de reprendre la nage", "Elle peut survenir y compris chez des nageurs expérimentés, souvent à la remontée. Les apnées statiques sont particulièrement redoutées."],
+[2, "02AC03", "Que provoque l'accumulation de CO₂ pendant l'apnée (hypercapnie) ?", "Maux de tête, vertiges, envie irrépressible de respirer", "Une baisse de la température corporelle du nageur", "Une meilleure oxygénation des tissus musculaires", "Une accélération du rythme digestif et des crampes", "Elle acidifie le sang et peut aller jusqu'à la perte de connaissance."],
+[2, "02AC04", "Quelle action de prévention du traumatisme du rachis est préconisée ?", "Rappeler systématiquement les risques des plongeons, surtout en zone peu profonde", "Interdire l'accès aux bassins profonds à tous les usagers sans exception", "Autoriser les plongeons surveillés dans toutes les zones du bassin", "Réserver l'information sur les risques aux seuls enfants et adolescents", "Aussi : signalétique adaptée (AFNOR Spec X50-001) et information sur les changements de profondeur (piscine, marées, bancs de sable, rochers)."],
+[2,"02AC05","Combien de décès par noyade accidentelle par an en France, selon Santé publique France ?","Environ 1 000","Environ 100","Environ 400","Environ 5 000","Première cause de mortalité par accident de la vie courante chez les moins de 25 ans. Environ 400 décès sur la saison estivale."],
+[2,"02AC05","En milieu naturel, quel milieu concentre la plus grande part des noyades ?","Cours et plans d'eau (55 %)","La mer (55 %)","Les piscines (55 %)","La mer et les piscines à parts égales","30 % en mer, 15 % en piscines. Les piscines privées familiales représentent environ les 2/3 des noyades en piscine."],
+[2, "02AC05", "Quelle différence entre noyade asphyxique et noyade syncopale ?", "La syncopale suit une perte de connaissance brutale précédant l'asphyxie, souvent sans signe visible", "L'asphyxique survient toujours sans aucun signe visible de détresse avant la perte de connaissance", "La syncopale n'a lieu qu'en eau douce, jamais en piscine ni en mer", "Il n'existe aucune différence entre les deux sur le plan médico-légal", "L'asphyxique s'accompagne le plus souvent de signes de détresse visibles (lutte, agitation, appels). La distinction pèse dans l'appréciation des responsabilités."],
+[2,"02AC05","Quel stade de noyade correspond à une victime inconsciente avec détresse respiratoire, sans arrêt de la respiration ?","Stade 3","Stade 2","Stade 4","Stade 1","Stade 4 : arrêt cardiorespiratoire."],
+[2,"02AC05","Quel stade de noyade correspond à une victime consciente avec détresse respiratoire, vomissements et frissons ?","Stade 2","Stade 1","Stade 3","Stade 4","Stade 1 : consciente, fatiguée, à froid, angoissée."],
+[2, "02AC05", "À quoi sert avant tout la classification par stades de noyade ?", "À transmettre entre SSA une évaluation rapide avec des termes communs", "À poser le diagnostic médical définitif de la victime avant l'arrivée des secours", "À déterminer la responsabilité pénale de l'exploitant de l'établissement", "À remplacer le bilan réalisé selon les références techniques PSE", "Elle sert à adapter sans délai les moyens engagés, le niveau d'urgence et la coordination des secours."],
+[2, "02AC05", "Selon la norme NF S52-014, que signifie « surveillance active » ?", "Rechercher avec une attention soutenue les baigneurs en danger, en tout point de la surface ou du fond, ou hors cadre réglementaire", "Être présent au bord du bassin avec le matériel de sauvetage à portée de main", "Observer uniquement la surface de l'eau depuis un poste fixe en hauteur", "Intervenir dès qu'un usager appelle à l'aide ou fait un signe de détresse", "Surveillance constante : observation ininterrompue du bassin et de ses abords."],
+[2,"02AC05","Quel profil peu intuitif figure parmi les personnes à risque de noyade ?","Une personne avec une forte densité musculaire","Une personne de moins de 30 ans sans pathologie","Une personne portant un bonnet de bain","Une personne ayant appris à nager enfant","La liste cite aussi non-nageur, enfant en bas âge, personne corpulente, senior, handicap connu, psychotropes."],
+
+// ───────── Chapitre 3 : Actions de prévention
+[3,"03AC01","Lequel est un moyen de prévention indirect ?","L'affichage du règlement intérieur et des consignes","L'accueil et l'information orale à l'arrivée","Un rappel au sifflet","La présence visible du SSA au bord de l'eau","Indirects : affichage, signalétique normalisée, panneaux pédagogiques, organisation spatiale, supports adaptés. Directs : action du personnel."],
+[3, "03AC01", "Que faire avant l'accès à l'eau d'un groupe constitué (ACM, scolaires) ?", "Un briefing systématique : consignes, organisation de la surveillance, rôles, responsables", "Les laisser entrer dans l'eau, puis les briefer une fois la baignade lancée", "Se contenter de l'affichage réglementaire à l'entrée de l'établissement", "Briefer uniquement les enfants de moins de six ans du groupe", "Le briefing est un moyen de prévention direct."],
+[3, "03PR01", "Pourquoi une action de prévention doit-elle être conduite dans un temps limité ?", "Parce qu'elle obère la capacité de surveillance du SSA", "Parce que les usagers s'agacent vite quand le SSA leur parle longtemps", "Parce que le chef de bassin doit valider chaque intervention de prévention", "Parce que le POSS limite chaque action de prévention à cinq minutes", "Elle fait partie de la mission, mais elle ne doit pas dégrader la surveillance."],
+[3, "03PR01", "L'action de prévention remet en cause la sécurité de la zone et ne peut pas se faire à distance. Que faire ?", "Évaluer le risque, prévenir l'équipe, puis réaliser ou faire réaliser l'action", "Renoncer à l'action de prévention et poursuivre la surveillance normale", "La réaliser immédiatement sans prévenir l'équipe pour gagner du temps", "Quitter le poste de surveillance sans attendre d'être remplacé", "Si l'action est possible à distance, on la réalise directement."],
+[3,"03PR01","Quelles zones à risques le SSA doit-il repérer ?","Profondeurs, toboggans, angles morts","Parking et vestiaires uniquement","Zone de pique-nique","Local technique et bureau","Il repère aussi les personnes à risque, les baigneurs en difficulté (fatigue, panique, immersion prolongée) et les comportements dangereux."],
+
+// ───────── Chapitre 4 : Dispositif de surveillance
+[4, "04AC01", "Que définit le POSS ?", "L'organisation de la surveillance, des secours et des interventions sur un lieu de baignade d'accès payant", "Le règlement intérieur applicable au public et les horaires d'ouverture de l'établissement", "Le plan annuel de formation continue des surveillants sauveteurs de l'établissement", "La liste du matériel de secours obligatoire à conserver au poste de secours", "Il formalise l'analyse des risques, les moyens humains et matériels et les procédures à appliquer."],
+[4,"04AC01","Où est déposé le POSS ?","Auprès des services préfectoraux","En mairie uniquement","Auprès de l'ARS","Nulle part, il reste au poste de secours","Toute modification fait l'objet d'un nouveau dépôt. Le SSA en prend connaissance avant de prendre ses fonctions."],
+[4, "04AC01", "Piscine de camping ou de copropriété (hors accès payant), sans POSS : que doit faire l'exploitant ?", "Prendre des dispositions pour contenir le risque et afficher une signalétique informant de l'absence de surveillance", "Rien : ces piscines ne sont soumises à aucune obligation de sécurité envers leurs usagers", "Installer obligatoirement un poste de secours et recruter un MNS à temps plein", "Déposer un POSS en préfecture comme pour un établissement d'accès payant", "Ces baignades ne sont pas soumises au POSS mais l'exploitant doit contenir le risque."],
+[4, "04AC01", "Quels accessoires sont le plus souvent la propriété du SSA ?", "Sifflet, palmes, lunettes de soleil, masque de poche", "Bouées et perches de sauvetage du poste", "Défibrillateur et sac de secours", "Plan dur d'immobilisation et collier cervical", "L'équipement vestimentaire est le plus souvent fourni par l'employeur."],
+[4,"04AC01","Quel élément de la liste de matériel est prévu uniquement en milieu naturel littoral ?","L'accès à l'eau chaude (piqûre de vive)","Le défibrillateur","L'oxygène médicinal","Le collier cervical","Le tire-tique est optionnel en milieu artificiel et prévu en milieu naturel."],
+[4,"04AC01","Quel intervalle maximal entre deux changements de poste de surveillance est préconisé ?","30 minutes","10 minutes","1 heure","2 heures","Même en zone unique, les changements d'emplacement ou de positionnement interviennent au maximum toutes les 30 minutes."],
+[4, "04AC01", "Un SSA doit s'absenter, même temporairement. Que doit-on faire ?", "Le remplacer immédiatement par un autre SSA, sinon envisager la fermeture du bassin ou de la zone", "Un usager de confiance le remplace le temps de son absence", "Un autre SSA couvre en plus sa propre zone sans autre mesure", "Il s'absente sans que l'organisation de la surveillance ne change", "La continuité de la surveillance ne peut être assurée que si les moyens sont suffisants et opérationnels."],
+[4,"04AC01","Quelle durée de travail consécutive le Code du travail autorise-t-il ?","6 heures consécutives","2 heures","4 heures","8 heures","Maximum 10 h cumulées sur une amplitude journalière de 11 h, avec recommandation de limiter les durées de surveillance continue."],
+[4, "04AC01", "Pourquoi alterner les modes de balayage visuel (en arc, zigzag horizontal, vertical…) ?", "Éviter la routine et ses effets distracteurs", "Se concentrer uniquement sur la surface de l'eau", "Réduire le nombre de SSA nécessaires au poste", "Remplacer les rotations de poste obligatoires", "Le balayage doit couvrir la surface et le fond, sans exclure les abords du bassin."],
+[4, "04AC01", "Quelles sont les trois catégories de facteurs intrusifs de la norme AFNOR ?", "Environnementaux, organisationnels, humains distracteurs", "Matériels, financiers et humains distracteurs", "Météorologiques, techniques et juridiques", "Individuels, collectifs et réglementaires", "Elles sont à intégrer à l'analyse des risques et au POSS."],
+[4,"04AC01","Les angles morts d'un bassin à géométrie complexe relèvent de quelle catégorie de facteurs intrusifs ?","Environnementaux","Organisationnels","Humains distracteurs","Réglementaires","Un sous-dimensionnement de l'équipe ou un cumul de missions est organisationnel. Téléphone, fatigue, routine : facteurs humains."],
+[4, "04AC01", "Un SSA exerce seul sur une zone. Que prévoit le POSS ?", "Un personnel présent sur site, identifiable et joignable, peut l'assister (secours, tâches intrusives)", "Il gère seul l'ensemble des tâches annexes, y compris les soins et la discipline", "Un usager volontaire l'assiste en cas de besoin pendant la surveillance", "La baignade est automatiquement fermée tant qu'un second SSA n'est pas présent", "Cela protège la surveillance contre les tâches intrusives (soins, actions de discipline)."],
+[4, "04AC01", "Que risque le SSA qui manque à son obligation de vigilance permanente ?", "Sa responsabilité civile, pénale ou disciplinaire", "Uniquement un rappel oral de la part de son employeur", "Une sanction de l'exploitant seulement, sans conséquence juridique", "Aucune responsabilité personnelle, l'employeur assumant tout", "Il est tenu à une obligation de moyens renforcée."],
+[4,"04AC02","Lequel est un signe avant-coureur de noyade ?","Des tentatives répétées de redressement","Un nageur qui enchaîne des longueurs régulières","Un baigneur qui discute dans l'eau","Un enfant qui joue avec un ballon","Aussi : agitation inhabituelle ou immobilité prolongée, difficulté à garder la tête hors de l'eau, battements désorganisés, regard fixe, attroupement, cris."],
+[4,"04AC02","Comment peut réagir un très jeune enfant en détresse ?","Par une sidération motrice : il peut couler subitement","Il appelle toujours à l'aide","Il regagne la surface à la recherche d'un appui","Il s'agite toujours bruyamment","Contrairement à l'adulte, il ne peut pas forcément regagner la surface."],
+[4, "04AC02", "Lequel de ces exemples est une situation dégradée ?", "La neutralisation d'un SSA ou un DAE hors service", "Un afflux normal de public un jour de beau temps", "Un temps ensoleillé avec peu de nuages", "Un changement de poste planifié dans le POSS", "Le SSA rend compte à sa hiérarchie dès la découverte et tout le personnel SSA est informé."],
+[4, "04AC02", "Quelle mesure d'adaptation en situation dégradée est prévue ?", "Réorganiser les zones, renforcer la vigilance, restreindre une zone ou suspendre la baignade", "Continuer comme si de rien n'était jusqu'à la fin de la journée", "Évacuer systématiquement l'établissement dès le moindre incident matériel", "Demander aux usagers de se surveiller entre eux en attendant le retour à la normale", "Les mesures sont conformes aux procédures du POSS."],
+[4,"04AC02","Quel principe applique le SSA dès la détection d'une anomalie ?","La levée de doute immédiate","L'évacuation générale","L'attente des secours","L'appel du maire","En accès payant, l'intervention est régie par le POSS."],
+[4, "04AC02", "Quels signaux déclenchent l'évacuation des bassins ?", "Alarme sonore continue ou coups de sifflet brefs et répétés", "Un seul coup de sifflet long, suivi d'une annonce", "Un drapeau vert hissé en haut du mât", "Une annonce orale sans signal préalable", "Le SSA canalise le public vers les zones de regroupement ou les pédiluves et vérifie visuellement les fonds de bassin."],
+[4, "04AC02", "Personne présumée disparue : quelle est la priorité absolue ?", "S'assurer qu'elle n'est pas dans l'eau (levée de doute aquatique) avant les recherches terrestres", "Appeler directement la police ou la gendarmerie pour signaler la disparition", "Fouiller d'abord les vestiaires puis les locaux techniques de l'établissement", "Évacuer l'ensemble du public avant de commencer toute recherche", "Ensuite : recherche sectorisée (infirmerie, vestiaires, locaux techniques), puis police ou gendarmerie si échec dans les délais."],
+[4, "04AC03", "Quelle posture adopter face à un conflit avec un usager ?", "Calme, neutralité, maîtrise de soi : désamorcer par le dialogue", "Autorité ferme et immédiate pour couper court à la discussion", "L'ignorer complètement pour ne pas envenimer la situation", "Répondre sur le même ton pour se faire respecter des usagers", "En cas de refus d'obtempérer ou de danger, le SSA appelle collègues et hiérarchie."],
+
+// ───────── Chapitre 5 : Action coordonnée de sauvetage
+[5, "05AC01", "Quelles techniques relèvent du sauvetage sans matériel ?", "Entrée dans l'eau, nage d'approche, prises de dégagement, remorquage", "Remorquage avec la bouée tube et mousquetonnage de la victime", "Extraction d'une victime traumatisée au moyen du plan dur", "Sortie sécurisée de la victime par les échelles du bassin", "Avec matériel : remorquage avec bouée tube."],
+[5, "05AC01", "Quels facteurs guident le choix de la technique d'extraction ?", "État de la victime, milieu, moyens matériels, nombre de SSA", "Uniquement l'âge apparent de la victime au moment de l'accident", "Uniquement le nombre de spectateurs présents autour du bassin", "La préférence personnelle du SSA pour une technique donnée", "La technique dépend notamment d'une suspicion de traumatisme du rachis ou d'une détresse vitale."],
+[5, "05AC02", "Quel est un inconvénient des palmes ?", "Perte de temps pour les chausser, risque de perte, évolution difficile sur terre", "Elles réduisent la vitesse de nage et fatiguent le SSA sur de courtes distances", "Elles empêchent toute technique de remorquage avec une victime", "Elles sont interdites pour le sauvetage en piscine", "Avantages : diminuer le temps d'intervention sur une grande distance de nage, faciliter les manœuvres."],
+[5,"05AC02","Combien de victimes une bouée tube peut-elle sécuriser ?","3 à 4 personnes","1 seule","10 personnes","2 exactement","Elle comporte une sangle, un mousqueton, deux anneaux et une corde d'environ 2 m."],
+[5, "05AC02", "Quel avantage de la bouée tube face à une victime paniquée ?", "Rester à distance et éviter les prises de dégagement", "Supprimer tout risque de blessure pour le SSA", "Remplacer la nage d'approche vers la victime", "Dispenser le SSA d'alerter les autres membres du dispositif", "Limites : peut s'emmêler, risque de blessure avec le mousqueton métallique."],
+[5, "05AC03", "Quel principe s'applique à la recherche suivie d'apnées ?", "Apnées courtes, contrôlées et répétées, sans jamais prolonger au détriment de sa sécurité", "Une seule longue apnée pour atteindre la victime le plus vite possible", "Entrer dans l'eau sans alerter personne afin de gagner du temps", "Se passer de repère visuel et plonger directement au centre du bassin", "Avant toute immersion : observer et localiser la zone de disparition, alerter, demander du renfort."],
+[5, "05AC03", "Quels risques menacent le SSA lors de recherches en apnée ?", "Hypoxie, désorientation, épuisement physique et psychique", "Une hypothermie systématique dès la première immersion", "Un surdosage en chlore par immersion prolongée", "Une fatigue visuelle uniquement, sans autre risque", "Dès le contact, il saisit la victime, la ramène en surface et enchaîne avec la prise en charge dans l'eau."],
+[5, "05PR01", "Quels sont les trois types de prise en charge d'une victime dans l'eau ?", "Aide à baigneur, sauvetage sur victime, sauvetage sur victimes multiples", "Aide, évacuation et réanimation de la victime sur le bord", "Alerte, extraction et bilan de la victime sur le bord du bassin", "Prévention, surveillance et intervention d'urgence dans la zone", "Aide à baigneur : personne incapable de regagner seule le bord."],
+[5, "05PR01", "Que fait le SSA avant d'entrer dans l'eau ?", "Il informe les autres membres du dispositif et le public", "Il entre immédiatement dans l'eau sans prévenir personne", "Il attend l'autorisation expresse du commandant des opérations de secours", "Il appelle le préfet pour signaler l'intervention", "Cela permet un renfort éventuel et facilite l'action de sauvetage."],
+[5,"05PR01","Quel est l'outil à privilégier pour sécuriser une victime dans l'eau ?","La bouée tube","Le plan dur","Les palmes","La perche seule","Dans la majorité des situations, dès que le SSA en dispose, son usage est fortement recommandé."],
+[5, "05PR01", "Abord d'une victime consciente avec la bouée tube : premier geste ?", "La présenter en gardant une distance de sécurité", "La lancer directement sur la victime", "La passer autour du cou de la victime", "Venir au contact pour la rassurer et la saisir", "Puis la passer sous les bras, mousquetonner et remorquer en gardant la tête hors de l'eau."],
+[5, "05PR01", "Victime consciente avec suspicion d'atteinte du rachis : quelle conduite ?", "La rassurer, l'inciter à ne pas bouger, stabiliser la tête dans la position où elle se trouve", "Redresser sa tête pour la remettre en position neutre avant tout mouvement", "La remorquer rapidement sur le dos jusqu'au bord du bassin", "L'inviter à rejoindre seule l'échelle la plus proche en nageant doucement", "L'objectif est de prévenir toute mobilisation du rachis cervical."],
+[5, "05PR01", "Victime inconsciente avec suspicion de traumatisme du rachis : qu'est-ce qui prime ?", "La détresse vitale : conduite à tenir de la victime inconsciente", "L'immobilisation stricte du rachis avant toute autre action", "L'attente des secours sans bouger la victime dans l'eau", "Une extraction immédiate par l'échelle avec l'aide de la victime", "La détresse vitale prime toujours sur la suspicion de lésion rachidienne."],
+[5, "05PR01", "Face à plusieurs victimes simultanées, que fait le SSA ?", "Identifier le nombre, alerter et demander des renforts sans délai, puis prioriser", "Prendre en charge la première victime vue jusqu'à son extraction complète", "Évacuer d'abord le public avant de s'occuper des victimes", "Attendre l'arrivée du COS avant d'intervenir sur les victimes", "La priorité tient compte de la gravité, de la vulnérabilité (enfant, personne âgée), du risque d'aggravation et des moyens."],
+[5,"05FT01","Quelle entrée dans l'eau est la référence pour la plupart des interventions de faible hauteur (moins d'1 m) ?","Le saut simple, pieds en premier","Le plongeon","Le dolphinage","La descente par l'échelle","Il limite le risque de blessure lié à la profondeur ou à un obstacle sous-marin."],
+[5, "05FT01", "Dans quelles conditions le plongeon est-il autorisé ?", "Milieu connu, profondeur et visibilité suffisantes", "Dans tous les cas, pour gagner du temps lors d'une intervention", "En milieu naturel inconnu, si la victime est proche du bord", "Uniquement lorsque le SSA est équipé d'une bouée tube", "Immersion d'environ 1 à 1,5 m maximum, tête sous les bras, corps gainé."],
+[5,"05FT01","À quel moment bascule-t-on de la course au « dolphinage » ?","Quand l'eau atteint mi-cuisse","Quand l'eau atteint les chevilles","Quand l'eau atteint la poitrine","Dès la première foulée dans l'eau","Le dolphinage s'apparente à la nage papillon. Quand la profondeur ne permet plus d'appui, on passe à la nage ventrale."],
+[5, "05FT02", "En quoi consiste la nage d'approche ?", "Alterner crawl tête dans l'eau et nage tête hors de l'eau pour garder le contact visuel", "Un crawl tête toujours immergée pour aller le plus vite possible", "Une brasse lente tête hors de l'eau jusqu'à la victime", "Une nage sur le dos pour garder la victime dans son champ de vision", "La nage tête haute s'appelle la nage water-polo."],
+[5, "05AC04", "Pourquoi une victime en détresse agrippe-t-elle le SSA ?", "Réaction de survie automatique : le besoin d'air est prioritaire et elle cherche un appui", "Elle cherche à aider le SSA à regagner le bord du bassin ensemble", "Elle obéit aux consignes verbales du SSA qui lui demande de s'accrocher à lui", "Elle reconnaît le SSA et cherche à le rassurer sur son état", "Elle peut être incapable de relâcher sa prise, même face aux consignes verbales."],
+[5, "05AC04", "Quelle est la priorité lors d'une saisie par la victime ?", "La sécurité du SSA : voies respiratoires, flottaison, capacité d'action", "Rassurer d'abord la victime verbalement avant toute autre action", "Continuer la nage sans réagir pour ne pas perdre de temps", "Lâcher la bouée et entourer la victime pour la calmer", "Le SSA exploite sa flottaison, l'immersion et l'apnée pour diminuer la traction."],
+[5,"05AC04","Par quoi doit être enchaînée une prise de dégagement ?","Une technique de remorquage sécurisée","Une sortie par l'échelle","Une nouvelle nage d'approche","Une pause pour rassurer","Cet enchaînement empêche toute nouvelle saisie et stabilise la victime."],
+[5, "05FT03", "Dégagement du cou ou des épaules : premier geste ?", "Pousser les bras de la victime par le dessous et vers le haut", "Tirer la victime vers soi pour la ramener au bord", "Se laisser couler en lâchant la victime", "Frapper les mains de la victime pour qu'elle lâche", "Puis attraper les poignets, tourner la victime, se positionner en remorquage."],
+[5, "05FT04", "Remorquage corps à corps : position de départ ?", "Face au dos de la victime, bras sous l'aisselle la plus proche, poignet opposé saisi, joue contre joue", "Face à la victime, les mains posées sur ses épaules pour la stabiliser", "À côté d'elle, en tenant ses vêtements pour la tracter", "Derrière elle, en la saisissant par les cheveux pour maintenir sa tête", "La tête de la victime reste hors de l'eau et le contact est maintenu."],
+[5,"05FT04","Quelle limite présente la propulsion en ciseaux de brasse ?","Mouvement saccadé, instable, inadapté au maintien statique","Elle est trop lente sur 10 m","Elle exige des palmes","Elle ne s'utilise qu'avec une victime consciente","Le rétropédalage, alterné et circulaire, assure une propulsion régulière sans phase de glisse marquée."],
+[5, "05FT04", "Remorquage avec palmes : comment saisir la victime ?", "Par les aisselles, bras tendus, en cherchant une position horizontale", "Par les poignets, bras fléchis, en nageant sur le côté", "Par la tête, d'une seule main, en nageant sur le dos", "Par la taille, en la tenant face à soi", "Le battement est alternatif, ample, régulier et continu."],
+[5, "05FT05", "Dans quels cas préconise-t-on le remorquage avec bouée tube ?", "Distances importantes et prise en charge sécurisée d'une victime paniquée", "Uniquement pour une victime inconsciente, en piscine et sur de courtes distances", "Uniquement sur de très courtes distances, sans victime paniquée", "Jamais en milieu naturel, où seul le remorquage à mains nues est autorisé", "Il limite le risque de saisie et réduit la fatigue du SSA."],
+[5,"05FT05","Victime consciente remorquée avec la bouée tube, dont l'état se dégrade : que faire ?","Passer en remorquage corps à corps","Continuer à tracter par la bouée","Attendre les secours dans l'eau","Lâcher la bouée tube","Pour une victime inconsciente, on se place d'emblée en corps à corps."],
+[5, "05FT06", "La sortie par les échelles est réservée à quelle victime ?", "Coopérative, stable, sans détresse vitale ni suspicion de traumatisme du rachis", "Une victime inconsciente, à extraire rapidement par le bord du bassin", "Une victime suspecte d'une atteinte du rachis, avec un plan dur disponible", "Une victime trop faible pour se tenir seule aux barreaux de l'échelle", "Elle exige une échelle fixe et accessible."],
+[5,"05FT06","Que fait-on de la bouée tube avant que la victime monte l'échelle ?","On la retire","On la laisse pour l'aider","On la serre davantage","On l'accroche à l'échelle","Veiller aussi à ce que la victime pose les deux pieds au sol avant de lâcher l'échelle."],
+[5, "05FT07", "Le dégagement d'urgence vise en priorité quelle victime ?", "Une victime inconsciente, à extraire pour pratiquer les gestes d'urgence vitale", "Une victime consciente et coopérative, capable de monter seule à l'échelle", "Une victime suspecte de traumatisme du rachis si un plan dur est disponible", "Un enfant épuisé mais conscient, qui peut se tenir aux barreaux", "Il se privilégie à plusieurs SSA et n'exige aucun matériel."],
+[5, "05FT07", "Dégagement d'urgence seul : comment maintenir les voies aériennes hors de l'eau si nécessaire ?", "Passer un genou entre les jambes de la victime", "Lui maintenir la tête calée sous son bras", "La tenir fermement par les cheveux", "La laisser flotter librement sur le dos", "Le SSA est en position corps à corps, dos au mur, avec saisie croisée des poignets."],
+[5, "05FT07", "Le SSA n'arrive pas à extraire seul la victime du bassin. Quelle aide ?", "La poussée d'Archimède : immerger légèrement la victime avant de la tirer vers le haut", "Tirer plus fort d'un coup sec, en prenant appui sur la goulotte", "Attendre sans rien tenter que d'autres secours arrivent", "Lâcher la victime et sortir du bassin pour chercher du renfort", "À trois SSA, le SSA 1 reste dans l'eau et assiste les SSA 2 et 3."],
+[5, "05FT08", "Pour quelle victime utilise-t-on l'extraction au plan dur ?", "Suspicion de traumatisme du rachis ou incapacité à sortir par les échelles (malaise, trouble de la conscience)", "Toute victime consciente, quel que soit son état et le matériel disponible", "Uniquement une victime inconsciente, sans suspicion de traumatisme", "Seulement une victime en arrêt cardiaque déjà extraite de l'eau", "Le plan dur maintient l'axe tête-cou-tronc."],
+[5, "05FT08", "Extraction d'une victime traumatisée : quel est le rôle du SSA 1 ?", "Derrière la victime, il stabilise la tête et maintient l'axe tête–cou–tronc", "Il apporte le plan dur à proximité de la victime", "Il glisse progressivement le plan dur sous la victime", "Il surveille la température de l'eau depuis le bord du bassin", "SSA 2 : flottaison. SSA 2 et 3 : plan dur. À l'extraction, le SSA 1 reste dans l'eau au contact."],
+[5,"05FT08","Quelle vérification est indispensable avant l'extraction du plan dur ?","L'arrimage de la victime","La température de l'eau","Le nombre de spectateurs","L'heure de l'accident","Cela évite toute chute. Risque associé : hypothermie."],
+
+// ───────── Chapitre 6 : Divers et formations
+[6,"06AC01","Que signifie POSS ?","Plan d'Organisation de la Surveillance et des Secours","Protocole d'Obligation de Sécurité du Service","Plan d'Orientation des Secours en Surface","Procédure d'Organisation du Sauvetage Standard","Abréviation du chapitre « Divers »."],
+[6,"06AC01","Que signifie DUERP ?","Document unique d'évaluation des risques professionnels","Dispositif d'urgence et d'évaluation des risques piscine","Dossier unique d'exploitation du réseau de piscines","Document usuel d'exploitation de la réglementation","Obligation de l'employeur au titre du Code du travail."],
+[6,"06AC01","Que signifie SB ACM ?","Surveillant de baignade pour accueil collectif de mineurs","Sauveteur de bassin en activité collective de masse","Service de baignade ouvert au public","Surveillant breveté en animation de centre","Brevet dont les prérogatives s'exercent uniquement en accueil collectif de mineurs."],
+[6,"06AC01","Que désigne OPTC dans la liste de matériel ?","Objet piquant, tranchant, coupant","Organisme de prévention et de traitement des chloramines","Outil de protection thermique et de confort","Obligation de présence en temps de crise","Le conteneur rigide pour OPTC fait partie du lot protection, sécurité, hygiène."],
+[6,"07AC01","Quelle surface minimale par personne pour un lieu de formation SSA ?","2 m²","1 m²","4 m²","6 m²","Le lieu doit aussi être abrité, chauffé ou climatisé, avec toilettes et point d'eau à proximité."],
+[6,"07AC01","Quelle est la masse ressentie du mannequin de sauvetage à un mètre de profondeur ?","1,5 kg (poids de 15 N)","5 kg","15 kg","0,5 kg","Sa conception ou son réglage doit empêcher que cette masse diminue pendant l'exercice par vidange."]
+];
+
+
+(function () {
+  "use strict";
+
+  var CH = [
+    { n: 1, t: "Situer son rôle et sa mission", s: "Responsabilités, secours, publics, posture" },
+    { n: 2, t: "Analyser les risques particuliers", s: "Hygiène, environnement, apnée, noyade" },
+    { n: 3, t: "Développer des actions de prévention", s: "Moyens directs et indirects" },
+    { n: 4, t: "Participer à un dispositif de surveillance", s: "POSS, matériel, surveillance, public" },
+    { n: 5, t: "Participer à une action de sauvetage", s: "Entrées, dégagements, remorquage, extraction" },
+    { n: 6, t: "Divers et formations", s: "Abréviations, obligations de formation" }
+  ];
+  var FICHES = {
+    "01AC01": "La formation et les prérogatives du SSA", "01AC02": "Les différents niveaux de responsabilité",
+    "01AC03": "L'organisation des secours", "01AC04": "La réglementation de l'accueil des différents publics",
+    "01AC05": "Rendre compte au travers d'un acte administratif", "01AC06": "Se situer dans la hiérarchie et l'organisation du milieu professionnel",
+    "01PR01": "Posture du SSA", "02AC01": "Les grands principes d'hygiène et de sécurité", "02AC02": "Les risques liés à l'environnement",
+    "02AC03": "L'apnée et ses dangers", "02AC04": "Les traumatismes du rachis dans l'eau", "02AC05": "Les grands principes de la noyade",
+    "03AC01": "Mettre en œuvre des moyens de prévention", "03PR01": "Conduire des actions de prévention",
+    "04AC01": "L'organisation de la sécurité", "04AC02": "Techniques de surveillance et de mise en alerte", "04AC03": "La gestion du public",
+    "05AC01": "Les techniques opérationnelles", "05AC02": "Assurer la prise en charge d'une victime dans l'eau",
+    "05AC03": "La recherche suivie d'une ou plusieurs apnées", "05PR01": "Prise en charge d'une victime dans l'eau",
+    "05FT01": "L'entrée dans l'eau", "05FT02": "Nage d'approche", "05AC04": "Les prises de dégagement", "05FT03": "Prises de dégagement",
+    "05FT04": "Remorquage", "05FT05": "Remorquage avec bouée tube", "05FT06": "Sortie sécurisée par les échelles",
+    "05FT07": "Dégagement d'urgence", "05FT08": "Extraction d'une victime traumatisée", "06AC01": "Informations générales",
+    "07AC01": "Obligations pour les formations"
+  };
+
+  function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; } return (h >>> 0).toString(36); }
+  var QS = RAW.map(function (r) { return { id: hash(r[2]), ch: r[0], f: r[1], q: r[2], o: [r[3], r[4], r[5], r[6]], e: r[7] }; });
+  var BY = {}; QS.forEach(function (q) { BY[q.id] = q; });
+
+  /* ---- Sauvegarde automatique : localStorage, réécrit à chaque réponse ---- */
+  var KEY = "ssa-revision-v1";
+  var S = { box: {}, missed: {}, session: null };
+  var stored = true; // false si le navigateur refuse d'écrire (navigation privée, stockage bloqué)
+  var view = "home";
+
+  function obj(o) { return o && typeof o === "object" && !Array.isArray(o) ? o : {}; }
+  // Remet au propre un état lu (stockage ou fichier) : ignore les questions disparues et les valeurs invalides
+  function clean(p) {
+    p = obj(p);
+    var st = { box: {}, missed: {}, session: null }, box = obj(p.box), missed = obj(p.missed), s = p.session;
+    Object.keys(box).forEach(function (k) { if (BY[k] && typeof box[k] === "number") st.box[k] = Math.max(0, Math.min(3, box[k] | 0)); });
+    Object.keys(missed).forEach(function (k) { if (BY[k] && missed[k]) st.missed[k] = 1; });
+    if (s && Array.isArray(s.ids) && Array.isArray(s.res) && s.ids.length && s.ids.every(function (id) { return BY[id]; }) && s.res.length <= s.ids.length) {
+      st.session = { mode: s.mode, title: String(s.title || "Session"), ids: s.ids, i: Math.max(0, Math.min(s.i | 0, s.ids.length - 1)), res: s.res.map(Boolean) };
+    }
+    return st;
+  }
+  function load() { try { var raw = localStorage.getItem(KEY); return raw ? clean(JSON.parse(raw)) : null; } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); stored = true; } catch (e) { stored = false; } }
+  S = load() || S;
+  save();
+
+  // Demande au navigateur de ne pas effacer ces données quand il fait de la place (une fois par visite)
+  var persistAsked = false;
+  function keep() {
+    if (persistAsked || !navigator.storage || !navigator.storage.persist) return;
+    persistAsked = true;
+    navigator.storage.persisted().then(function (ok) { if (!ok) return navigator.storage.persist(); }).catch(function () {});
+  }
+
+  // Un autre onglet a pu avancer entre-temps : on repart de la version enregistrée
+  // pour ne jamais l'écraser avec une progression périmée.
+  function sync() {
+    var p = load(); if (!p) return;
+    S.box = p.box; S.missed = p.missed;
+    if (view !== "quiz") S.session = p.session;
+    if (view === "home") renderHome(true);
+  }
+  window.addEventListener("storage", function (e) { if (e.key === KEY || e.key === null) sync(); });
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") sync(); });
+  window.addEventListener("pageshow", function (e) { if (e.persisted) sync(); });
+
+  /* ---- Outils ---- */
+  var app = document.getElementById("app");
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function flag(color) { return '<svg class="flag" style="color:' + color + '" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="2.4" height="20" rx="1.2" fill="currentColor" opacity=".55"/><rect x="7" y="3.5" width="14" height="10" rx="1.5"/></svg>'; }
+  function mastered(id) { return (S.box[id] || 0) >= 2 && !S.missed[id]; }
+  function pct(list) { if (!list.length) return 0; return Math.round(100 * list.filter(function (q) { return mastered(q.id); }).length / list.length); }
+
+  function pickPriority(pool, n) {
+    var scored = pool.map(function (q) {
+      var b = S.box[q.id], p;
+      if (S.missed[q.id]) p = 0; else if (b === undefined) p = 1; else p = 2 + b;
+      return [p + Math.random() * 0.9, q.id];
+    });
+    scored.sort(function (a, b) { return a[0] - b[0]; });
+    return shuffle(scored.slice(0, n).map(function (x) { return x[1]; }));
+  }
+  function pickExam(n) {
+    var total = QS.length, plan = [], used = 0;
+    CH.forEach(function (c) {
+      var pool = QS.filter(function (q) { return q.ch === c.n; });
+      var exact = n * pool.length / total, base = Math.floor(exact);
+      plan.push({ pool: pool, base: base, frac: exact - base }); used += base;
+    });
+    plan.slice().sort(function (a, b) { return b.frac - a.frac; }).forEach(function (p) { if (used < n && p.base < p.pool.length) { p.base++; used++; } });
+    var ids = [];
+    plan.forEach(function (p) { shuffle(p.pool).slice(0, p.base).forEach(function (q) { ids.push(q.id); }); });
+    return shuffle(ids);
+  }
+
+  function start(mode, title, ids) {
+    if (!ids.length) return;
+    S.session = { mode: mode, title: title, ids: ids, i: 0, res: [] };
+    save(); renderQuiz();
+  }
+
+  /* ---- Accueil ---- */
+  function renderHome(keepScroll) {
+    view = "home";
+    var all = pct(QS), seen = Object.keys(S.box).length, missedN = Object.keys(S.missed).length;
+    var h = '<header class="top"><div><h1>Révision SSA</h1><div class="sub">Références techniques nationales · édition septembre 2026</div></div>' +
+      '<div class="mastery"><b>' + all + ' %</b><span>maîtrisé</span></div></header><div class="stack">';
+    if (S.session) {
+      h += '<div class="resume"><span><b>Session en cours</b> · ' + esc(S.session.title) + ' (' + S.session.res.length + '/' + S.session.ids.length + ')</span>' +
+        '<button class="btn small primary" data-act="resume">Reprendre</button></div>';
+    }
+    h += '<div class="hero"><div><h2>Session rapide</h2><p>10 questions : tes erreurs d\'abord, puis ce que tu n\'as pas encore vu.</p></div>' +
+      '<button class="btn-inv" data-act="quick">Lancer</button></div>';
+    h += '<div class="grid2"><button class="btn" data-act="exam">Examen blanc<small>30 questions, tous chapitres</small></button>' +
+      '<button class="btn" data-act="errors"' + (missedN ? '' : ' disabled') + '>Mes erreurs<small>' + (missedN ? missedN + ' à revoir' : 'aucune pour l\'instant') + '</small></button></div>';
+    h += '<div class="label">Par chapitre · ' + QS.length + ' questions · ' + seen + ' déjà vues</div>';
+    CH.forEach(function (c) {
+      var list = QS.filter(function (q) { return q.ch === c.n; }), p = pct(list);
+      h += '<div class="chrow"><button class="chmain" data-act="chap" data-n="' + c.n + '"><span class="chnum">' + c.n + '</span><span class="chtxt"><b>' + esc(c.t) + '</b><span>' + esc(c.s) + '</span>' +
+        '<div class="bar" role="img" aria-label="' + p + ' % maîtrisé"><i style="width:' + p + '%"></i></div></span></button>' +
+        '<button class="chall" data-act="chapall" data-n="' + c.n + '" aria-label="Tout le chapitre ' + c.n + ', ' + list.length + ' questions"><b>' + list.length + '</b>tout</button></div>';
+    });
+    var standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+    h += '<div class="label">Sauvegarde</div><div class="save">' +
+      (stored ? '<span class="st">Progression enregistrée automatiquement sur cet appareil, à chaque réponse.</span>'
+              : '<span class="st warn">Ce navigateur bloque l\'enregistrement (navigation privée ?) : ta progression sera perdue à la fermeture. Exporte-la avant de partir.</span>') +
+      '<p class="tip">' + (standalone ? '' : 'Ajoute le site à l\'écran d\'accueil : le navigateur ne fera plus le ménage dans ta progression. ') +
+      'Exporte un fichier de temps en temps pour garder une copie ou changer d\'appareil.</p>' +
+      '<div class="grid2"><button class="btn" data-act="export">Exporter<small>Télécharger un fichier</small></button>' +
+      '<button class="btn" data-act="import">Importer<small>Restaurer un fichier</small></button></div>' +
+      '<input type="file" id="importfile" accept=".json,application/json" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" tabindex="-1" aria-hidden="true">' +
+      '<div id="savemsg" aria-live="polite"></div></div>';
+    h += '<footer class="foot"><span>Une question est « maîtrisée » après deux bonnes réponses d\'affilée. Toutes les questions viennent des fiches RTN SSA ; la fiche source s\'affiche après chaque réponse.</span>' +
+      '<div id="reset"><button class="linkbtn" data-act="reset">Réinitialiser ma progression</button></div></footer></div>';
+    app.innerHTML = h;
+    if (!keepScroll) window.scrollTo(0, 0);
+  }
+
+  /* ---- Fichier de sauvegarde (copie de sécurité, changement d'appareil) ---- */
+  var pending = null;
+  function saveMsg(html, bad) { var m = document.getElementById("savemsg"); if (m) m.innerHTML = html ? '<p class="msg' + (bad ? ' bad' : '') + '">' + html + '</p>' : ''; }
+  function exportFile() {
+    var now = new Date();
+    var data = { app: "revision-ssa", version: 1, date: now.toISOString(), box: S.box, missed: S.missed };
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
+    a.download = "revision-ssa-" + now.toISOString().slice(0, 10) + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    saveMsg("Fichier de sauvegarde téléchargé.");
+  }
+  function readImport(file) {
+    var r = new FileReader();
+    r.onload = function () {
+      var d = null; try { d = JSON.parse(r.result); } catch (e) {}
+      if (!d || d.app !== "revision-ssa") { saveMsg("Fichier non reconnu : choisis un fichier exporté depuis Révision SSA.", true); return; }
+      pending = clean(d);
+      var when = new Date(d.date), n = Object.keys(pending.box).length;
+      saveMsg('<span class="confirm"><span>Remplacer ta progression par celle du fichier' + (isNaN(when) ? '' : ' du ' + when.toLocaleDateString("fr-FR")) + ' (' + n + ' question' + (n > 1 ? 's' : '') + ' vue' + (n > 1 ? 's' : '') + ') ?</span>' +
+        '<button class="btn small" data-act="import-no">Annuler</button><button class="btn small primary" data-act="import-yes">Remplacer</button></span>');
+    };
+    r.onerror = function () { saveMsg("Lecture du fichier impossible.", true); };
+    r.readAsText(file);
+  }
+
+  /* ---- Quiz ---- */
+  var cur = null;
+  function renderQuiz() {
+    var s = S.session; if (!s) return renderHome();
+    // Page rechargée juste après une réponse : on passe à la question suivante (ou au résultat)
+    if (s.res.length > s.i) {
+      if (s.res.length >= s.ids.length) return renderResult();
+      s.i = s.res.length; save();
+    }
+    view = "quiz";
+    var q = BY[s.ids[s.i]];
+    cur = { order: shuffle([0, 1, 2, 3]), picked: null, q: q };
+    var segs = s.ids.map(function (id, k) {
+      var cls = k < s.res.length ? (s.res[k] ? 'ok' : 'ko') : (k === s.i ? 'now' : '');
+      return '<i class="' + cls + '"></i>';
+    }).join('');
+    var opts = cur.order.map(function (orig, pos) {
+      return '<li><button class="opt" data-k="' + pos + '"><span class="k">' + 'ABCD'[pos] + '</span><span>' + esc(q.o[orig]) + '</span></button></li>';
+    }).join('');
+    app.innerHTML = '<div class="qtop"><button class="linkbtn" data-act="home">← Accueil</button><span class="count">' + (s.i + 1) + ' / ' + s.ids.length + '</span></div>' +
+      '<div class="prog" aria-hidden="true">' + segs + '</div>' +
+      '<span class="chip">Chapitre ' + q.ch + '</span>' +
+      '<h2 class="question">' + esc(q.q) + '</h2><ul class="opts">' + opts + '</ul>' +
+      '<div id="fb" aria-live="polite"></div><div class="bottom" id="bottom" hidden></div>';
+    window.scrollTo(0, 0);
+  }
+
+  function pick(pos) {
+    if (!cur || cur.picked !== null || pos < 0 || pos > 3) return;
+    var s = S.session, q = cur.q, ok = cur.order[pos] === 0;
+    cur.picked = pos;
+    var btns = app.querySelectorAll(".opt");
+    btns.forEach(function (b, k) {
+      b.disabled = true;
+      if (cur.order[k] === 0) b.classList.add("good");
+      else if (k === pos) b.classList.add("bad");
+      else b.classList.add("dim");
+    });
+    s.res.push(ok);
+    if (ok) { S.box[q.id] = Math.min((S.box[q.id] || 0) + 1, 3); delete S.missed[q.id]; }
+    else { S.box[q.id] = 0; S.missed[q.id] = 1; }
+    var last = s.i === s.ids.length - 1;
+    var fiche = FICHES[q.f] ? FICHES[q.f] : "";
+    document.getElementById("fb").innerHTML =
+      '<div class="fb ' + (ok ? 'good' : 'bad') + '"><h3>' + flag(ok ? 'var(--green)' : 'var(--red)') + (ok ? 'Bonne réponse' : 'À revoir') + '</h3>' +
+      (ok ? '' : '<p><b>Réponse attendue :</b> ' + esc(q.o[0]) + '</p>') +
+      '<p>' + esc(q.e) + '</p><div class="ref"><span class="chip">' + esc(q.f) + '</span>' + esc(fiche) + '</div></div>';
+    var bt = document.getElementById("bottom");
+    bt.hidden = false;
+    bt.innerHTML = '<button class="next" id="next">' + (last ? 'Voir le résultat' : 'Question suivante') + '</button><div class="hint">Raccourcis : A–D ou 1–4 pour répondre, Entrée pour continuer</div>';
+    save(); keep();
+    var nx = document.getElementById("next");
+    nx.addEventListener("click", next);
+    nx.focus({ preventScroll: true });
+    nx.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  function next() {
+    var s = S.session; if (!s || !cur || cur.picked === null) return;
+    if (s.i >= s.ids.length - 1) { renderResult(); return; }
+    s.i++; save(); renderQuiz();
+  }
+
+  function renderResult() {
+    var s = S.session; if (!s) return renderHome();
+    view = "result";
+    var good = s.res.filter(Boolean).length, n = s.ids.length, r = good / n;
+    var color = r >= 0.8 ? 'green' : r >= 0.5 ? 'yellow' : 'red';
+    var word = r >= 0.8 ? 'Drapeau vert' : r >= 0.5 ? 'Drapeau jaune' : 'Drapeau rouge';
+    var sub = r >= 0.8 ? 'Solide. Garde le rythme avec une session rapide demain.' : r >= 0.5 ? 'Bases acquises, quelques points à consolider ci-dessous.' : 'À reprendre : relis les fiches indiquées puis refais les erreurs.';
+    var wrong = s.ids.filter(function (id, k) { return !s.res[k]; });
+    var h = '<div class="stack"><div class="score"><div class="big">' + good + ' / ' + n + '</div><div class="verdict v-' + color + '">' + flag('var(--' + color + ')') + word + '</div><p>' + sub + '</p></div>';
+    if (wrong.length) {
+      h += '<div class="label">À revoir · ' + wrong.length + '</div>';
+      wrong.forEach(function (id) {
+        var q = BY[id];
+        h += '<div class="miss"><span class="chip">' + esc(q.f) + '</span><p class="q">' + esc(q.q) + '</p><p class="a">' + esc(q.o[0]) + '</p><p class="e">' + esc(q.e) + '</p></div>';
+      });
+    } else {
+      h += '<div class="empty">Aucune erreur sur cette session.</div>';
+    }
+    h += '<div class="grid2">' + (wrong.length ? '<button class="btn primary" data-act="redo">Refaire mes erreurs<small style="color:inherit;opacity:.85">' + wrong.length + ' question' + (wrong.length > 1 ? 's' : '') + '</small></button>' : '<button class="btn primary" data-act="quick">Nouvelle session<small style="color:inherit;opacity:.85">10 questions</small></button>') +
+      '<button class="btn" data-act="home">Accueil<small>Tous les chapitres</small></button></div></div>';
+    var wrongIds = wrong.slice();
+    S.session = null; save();
+    app.innerHTML = h;
+    app.querySelector('[data-act="redo"]') && (app.querySelector('[data-act="redo"]').onclick = function () { start("redo", "Mes erreurs", shuffle(wrongIds)); });
+    window.scrollTo(0, 0);
+  }
+
+  /* ---- Événements ---- */
+  app.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-act],[data-k]"); if (!t) return;
+    if (t.hasAttribute("data-k")) { pick(parseInt(t.getAttribute("data-k"), 10)); return; }
+    var a = t.getAttribute("data-act"), n = parseInt(t.getAttribute("data-n"), 10);
+    if (a === "quick") start("quick", "Session rapide", pickPriority(QS, 10));
+    else if (a === "exam") start("exam", "Examen blanc", pickExam(30));
+    else if (a === "errors") { var ids = Object.keys(S.missed); start("errors", "Mes erreurs", pickPriority(ids.map(function (i) { return BY[i]; }), Math.min(ids.length, 15))); }
+    else if (a === "chap") start("chap", "Chapitre " + n, pickPriority(QS.filter(function (q) { return q.ch === n; }), 10));
+    else if (a === "chapall") start("chapall", "Chapitre " + n + " complet", shuffle(QS.filter(function (q) { return q.ch === n; }).map(function (q) { return q.id; })));
+    else if (a === "resume") renderQuiz();
+    else if (a === "home") renderHome();
+    else if (a === "reset") {
+      document.getElementById("reset").innerHTML = '<div class="confirm"><span>Effacer toute la progression ?</span><button class="btn small" data-act="reset-no">Annuler</button><button class="btn small primary" data-act="reset-yes">Effacer</button></div>';
+    }
+    else if (a === "reset-no") renderHome();
+    else if (a === "reset-yes") { S = { box: {}, missed: {}, session: null }; save(); renderHome(); }
+    else if (a === "export") exportFile();
+    else if (a === "import") { var inp = document.getElementById("importfile"); inp.value = ""; inp.click(); }
+    else if (a === "import-no") { pending = null; saveMsg(""); }
+    else if (a === "import-yes" && pending) { S.box = pending.box; S.missed = pending.missed; pending = null; save(); renderHome(true); saveMsg("Progression restaurée."); }
+  });
+  app.addEventListener("change", function (e) {
+    if (e.target.id === "importfile" && e.target.files && e.target.files[0]) readImport(e.target.files[0]);
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey || !cur || !S.session || !app.querySelector(".opts")) return;
+    var k = e.key.toLowerCase(), idx = "abcd".indexOf(k);
+    if (idx < 0 && "1234".indexOf(k) >= 0 && k.length === 1) idx = parseInt(k, 10) - 1;
+    if (idx >= 0 && idx < 4 && k.length === 1) { pick(idx); return; }
+    if (cur.picked !== null && (e.key === "ArrowRight" || (e.key === "Enter" && e.target.tagName !== "BUTTON"))) { e.preventDefault(); next(); }
+  });
+
+  renderHome();
+
+  // Hors ligne et installation sur l'écran d'accueil
+  if ("serviceWorker" in navigator && window.isSecureContext) navigator.serviceWorker.register("sw.js").catch(function () {});
+})();
+</script>
+
+</body></html>

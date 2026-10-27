@@ -1,0 +1,16 @@
+{
+  "name": "Révision SSA",
+  "short_name": "Révision SSA",
+  "description": "Quiz de révision du Surveillant Sauveteur Aquatique (SSA).",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EAF0F3",
+  "theme_color": "#EAF0F3",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
