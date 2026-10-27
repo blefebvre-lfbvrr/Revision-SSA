@@ -178,6 +178,28 @@ footer.foot { margin-top: 22px; color: var(--muted); font-size: 13px; display: f
 @media (prefers-reduced-motion: no-preference) { .opt, .btn, .next { transition: border-color .12s, background-color .12s; } }
 
 footer.foot .warn { color: var(--red); }
+
+/* Fiches : lecture et écoute des points clés */
+.rtitle { font-family: var(--f-display); font-size: 30px; text-transform: uppercase; letter-spacing: .02em; line-height: 1; margin: 4px 0 6px; }
+.rsub { color: var(--muted); font-size: 14px; margin: 0; }
+.fiche { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; margin-top: 10px; }
+.fiche summary { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; min-height: 56px; }
+.fiche summary::-webkit-details-marker { display: none; }
+.fiche summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 12px; }
+.fmeta { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.fiche summary b { grid-column: 1; font-weight: 600; line-height: 1.25; }
+.fiche summary::after { content: ""; grid-column: 2; grid-row: 1 / span 2; width: 9px; height: 9px; margin: 0 4px 4px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
+.fiche[open] summary::after { transform: rotate(-135deg); margin: 6px 4px 0; }
+.factions { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 14px 12px; }
+.factions .btn.small { min-height: 40px; padding: 8px 14px; }
+.points { list-style: none; margin: 0; padding: 0 14px 4px; }
+.points li { border-top: 1px solid var(--line); padding: 10px 0; }
+.points li.missed { border-left: 3px solid var(--red); padding-left: 10px; }
+.points li.reading { background: var(--accent-soft); margin: 0 -14px; padding-inline: 14px; }
+.points .q { font-weight: 600; margin: 0 0 4px; }
+.points .a { color: var(--green); font-weight: 500; margin: 0 0 4px; }
+.points .e { font-size: 14px; color: var(--muted); margin: 0; }
+.fb .linkbtn { color: var(--accent); font-weight: 600; text-decoration: none; padding: 6px 0 0; min-height: 36px; }
 </style>
 </head>
 <body>
@@ -487,6 +509,7 @@ const RAW = [
       '<button class="btn-inv" data-act="quick">Lancer</button></div>';
     h += '<div class="grid2"><button class="btn" data-act="exam">Examen blanc<small>30 questions, tous chapitres</small></button>' +
       '<button class="btn" data-act="errors"' + (missedN ? '' : ' disabled') + '>Mes erreurs<small>' + (missedN ? missedN + ' à revoir' : 'aucune pour l\'instant') + '</small></button></div>';
+    h += '<button class="btn" data-act="read">Fiches de révision<small>' + (canSpeak ? 'Lire ou écouter' : 'Lire') + ' les points clés, fiche par fiche</small></button>';
     h += '<div class="label">Par chapitre · ' + QS.length + ' questions · ' + seen + ' déjà vues</div>';
     CH.forEach(function (c) {
       var list = QS.filter(function (q) { return q.ch === c.n; }), p = pct(list);
@@ -548,7 +571,8 @@ const RAW = [
     document.getElementById("fb").innerHTML =
       '<div class="fb ' + (ok ? 'good' : 'bad') + '"><h3>' + flag(ok ? 'var(--green)' : 'var(--red)') + (ok ? 'Bonne réponse' : 'À revoir') + '</h3>' +
       (ok ? '' : '<p><b>Réponse attendue :</b> ' + esc(q.o[0]) + '</p>') +
-      '<p>' + esc(q.e) + '</p><div class="ref"><span class="chip">' + esc(q.f) + '</span>' + esc(fiche) + '</div></div>';
+      '<p>' + esc(q.e) + '</p><div class="ref"><span class="chip">' + esc(q.f) + '</span>' + esc(fiche) + '</div>' +
+      '<button class="linkbtn" data-act="readf" data-f="' + esc(q.f) + '">Lire la fiche →</button></div>';
     var bt = document.getElementById("bottom");
     bt.hidden = false;
     bt.innerHTML = '<button class="next" id="next">' + (last ? 'Voir le résultat' : 'Question suivante') + '</button><div class="hint">Raccourcis : A–D ou 1–4 pour répondre, Entrée pour continuer</div>';
@@ -575,6 +599,8 @@ const RAW = [
     var wrong = s.ids.filter(function (id, k) { return !s.res[k]; });
     var h = '<div class="stack"><div class="score"><div class="big">' + good + ' / ' + n + '</div><div class="verdict v-' + color + '">' + flag('var(--' + color + ')') + word + '</div><p>' + sub + '</p></div>';
     if (wrong.length) {
+      var nf = ficheCodes(wrong).length;
+      h += '<button class="btn" data-act="readwrong">Lire les fiches à revoir<small>' + nf + ' fiche' + (nf > 1 ? 's' : '') + (canSpeak ? ', à lire ou à écouter' : '') + '</small></button>';
       h += '<div class="label">À revoir · ' + wrong.length + '</div>';
       wrong.forEach(function (id) {
         var q = BY[id];
@@ -585,19 +611,105 @@ const RAW = [
     }
     h += '<div class="grid2">' + (wrong.length ? '<button class="btn primary" data-act="redo">Refaire mes erreurs<small style="color:inherit;opacity:.85">' + wrong.length + ' question' + (wrong.length > 1 ? 's' : '') + '</small></button>' : '<button class="btn primary" data-act="quick">Nouvelle session<small style="color:inherit;opacity:.85">10 questions</small></button>') +
       '<button class="btn" data-act="home">Accueil<small>Tous les chapitres</small></button></div></div>';
-    var wrongIds = wrong.slice();
+    lastWrong = wrong.slice();
     S.session = null; save();
     app.innerHTML = h;
-    app.querySelector('[data-act="redo"]') && (app.querySelector('[data-act="redo"]').onclick = function () { start("redo", "Mes erreurs", shuffle(wrongIds)); });
     window.scrollTo(0, 0);
+  }
+
+  /* ---- Fiches : lecture et écoute ---- */
+  var lastWrong = [];
+  var rd = { only: null, back: "home", redo: false };
+  function ficheCodes(ids) { var out = []; ids.forEach(function (id) { var f = BY[id].f; if (out.indexOf(f) < 0) out.push(f); }); return out; }
+  function openRead(only, back, redo) { rd = { only: only, back: back || "home", redo: !!redo }; renderRead(); }
+
+  function renderRead() {
+    stopVoice();
+    view = "read";
+    var single = rd.only && rd.only.length === 1, anyMissed = false;
+    var h = '<div class="qtop"><button class="linkbtn" data-act="' + (rd.back === "quiz" ? 'resume' : 'home') + '">← ' + (rd.back === "quiz" ? 'Retour à la session' : 'Accueil') + '</button></div>' +
+      '<h2 class="rtitle">' + (single ? 'Fiche à relire' : rd.only ? 'Fiches à revoir' : 'Fiches de révision') + '</h2>';
+    var body = '';
+    CH.forEach(function (c) {
+      var codes = ficheCodes(QS.filter(function (q) { return q.ch === c.n; }).map(function (q) { return q.id; }))
+        .filter(function (f) { return !rd.only || rd.only.indexOf(f) >= 0; });
+      if (!codes.length) return;
+      body += '<div class="label">Chapitre ' + c.n + ' · ' + esc(c.t) + '</div>';
+      codes.forEach(function (f) {
+        var list = QS.filter(function (q) { return q.f === f; }), m = list.filter(function (q) { return mastered(q.id); }).length;
+        body += '<details class="fiche"' + (rd.only ? ' open' : '') + '><summary><span class="fmeta"><span class="chip">' + esc(f) + '</span>' + m + ' / ' + list.length + ' maîtrisée' + (list.length > 1 ? 's' : '') + '</span><b>' + esc(FICHES[f] || f) + '</b></summary>' +
+          '<div class="factions">' + (canSpeak ? '<button class="btn small" data-act="listen" data-f="' + esc(f) + '" aria-pressed="false">▶ Écouter</button>' : '') +
+          '<button class="btn small" data-act="ficheq" data-f="' + esc(f) + '">S\'entraîner · ' + list.length + '</button></div><ol class="points">' +
+          list.map(function (q) {
+            if (S.missed[q.id]) anyMissed = true;
+            return '<li data-id="' + q.id + '"' + (S.missed[q.id] ? ' class="missed"' : '') + '><p class="q">' + esc(q.q) + '</p><p class="a">' + esc(q.o[0]) + '</p><p class="e">' + esc(q.e) + '</p></li>';
+          }).join('') + '</ol></details>';
+      });
+    });
+    var sub = rd.redo ? 'D\'après les erreurs de ta session.' : rd.only ? '' : 'Les points clés de chaque fiche. Ouvre une fiche pour la ' + (canSpeak ? 'lire ou l\'écouter.' : 'lire.');
+    if (anyMissed) sub += (sub ? ' ' : '') + 'En rouge : tes erreurs.';
+    if (sub) h += '<p class="rsub">' + sub + '</p>';
+    h += body;
+    if (rd.redo && lastWrong.length) h += '<div class="bottom"><button class="next" data-act="redo">Refaire mes erreurs · ' + lastWrong.length + '</button></div>';
+    if (rd.only) h += '<button class="linkbtn" data-act="read">Voir toutes les fiches</button>';
+    app.innerHTML = h;
+    window.scrollTo(0, 0);
+  }
+
+  // Écoute : synthèse vocale du navigateur, un point à la fois, en surlignant celui qui est lu
+  var canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  var voiceRun = 0, speaking = null;
+  function frVoice() {
+    var v = speechSynthesis.getVoices().filter(function (x) { return /^fr/i.test(x.lang); });
+    return v.filter(function (x) { return /^fr[-_]FR/i.test(x.lang); })[0] || v[0] || null;
+  }
+  function stopVoice() {
+    if (!canSpeak) return;
+    voiceRun++; speaking = null;
+    speechSynthesis.cancel();
+    app.querySelectorAll(".points li.reading").forEach(function (el) { el.classList.remove("reading"); });
+    app.querySelectorAll('[data-act="listen"]').forEach(function (b) { b.textContent = "▶ Écouter"; b.setAttribute("aria-pressed", "false"); });
+  }
+  function listen(f) {
+    var was = speaking; stopVoice(); if (was === f) return;
+    var run = voiceRun, voice = frVoice(), list = QS.filter(function (q) { return q.f === f; });
+    speaking = f;
+    var btn = app.querySelector('[data-act="listen"][data-f="' + f + '"]');
+    if (btn) { btn.textContent = "■ Arrêter"; btn.setAttribute("aria-pressed", "true"); }
+    var parts = [{ id: null, t: "Fiche : " + (FICHES[f] || f) + "." }].concat(list.map(function (q) {
+      return { id: q.id, t: q.q + " Réponse : " + q.o[0] + ". " + q.e };
+    }));
+    parts.forEach(function (p, k) {
+      var u = new SpeechSynthesisUtterance(p.t);
+      u.lang = "fr-FR"; if (voice) u.voice = voice;
+      u.onstart = function () {
+        if (run !== voiceRun) return;
+        app.querySelectorAll(".points li.reading").forEach(function (el) { el.classList.remove("reading"); });
+        var li = p.id && app.querySelector('.points li[data-id="' + p.id + '"]');
+        if (li) { li.classList.add("reading"); li.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+      };
+      if (k === parts.length - 1) u.onend = u.onerror = function () { if (run === voiceRun) stopVoice(); };
+      speechSynthesis.speak(u);
+    });
+  }
+  if (canSpeak) {
+    speechSynthesis.getVoices();
+    window.addEventListener("pagehide", function () { speechSynthesis.cancel(); });
   }
 
   /* ---- Événements ---- */
   app.addEventListener("click", function (e) {
     var t = e.target.closest("[data-act],[data-k]"); if (!t) return;
     if (t.hasAttribute("data-k")) { pick(parseInt(t.getAttribute("data-k"), 10)); return; }
-    var a = t.getAttribute("data-act"), n = parseInt(t.getAttribute("data-n"), 10);
+    var a = t.getAttribute("data-act"), n = parseInt(t.getAttribute("data-n"), 10), f = t.getAttribute("data-f");
+    if (a !== "listen") stopVoice();
     if (a === "quick") start("quick", "Session rapide", pickPriority(QS, 10));
+    else if (a === "redo") start("redo", "Mes erreurs", shuffle(lastWrong));
+    else if (a === "read") openRead(null, "home");
+    else if (a === "readf") openRead([f], view === "quiz" ? "quiz" : "home");
+    else if (a === "readwrong") openRead(ficheCodes(lastWrong), "home", true);
+    else if (a === "listen") listen(f);
+    else if (a === "ficheq") start("fiche", "Fiche " + f, shuffle(QS.filter(function (q) { return q.f === f; }).map(function (q) { return q.id; })));
     else if (a === "exam") start("exam", "Examen blanc", pickExam(30));
     else if (a === "errors") { var ids = Object.keys(S.missed); start("errors", "Mes erreurs", pickPriority(ids.map(function (i) { return BY[i]; }), Math.min(ids.length, 15))); }
     else if (a === "chap") start("chap", "Chapitre " + n, pickPriority(QS.filter(function (q) { return q.ch === n; }), 10));

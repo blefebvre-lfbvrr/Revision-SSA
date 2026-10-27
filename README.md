@@ -2,6 +2,8 @@
 
 Quiz de révision du **Surveillant Sauveteur Aquatique** (références techniques nationales, édition septembre 2026) : sessions rapides de 10 questions, examen blanc de 30 questions, révision par chapitre et suivi des erreurs.
 
+**Fiches de révision :** les points clés de chaque fiche RTN, à lire ou à écouter (synthèse vocale du navigateur). Accessibles depuis l'accueil, depuis chaque réponse (« Lire la fiche ») et depuis le résultat d'une session (« Lire les fiches à revoir »).
+
 **Site :** https://blefebvre-lfbvrr.github.io/Revision-SSA/
 
 ## Progression
