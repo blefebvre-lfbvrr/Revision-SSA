@@ -191,7 +191,7 @@ footer.foot .warn { color: var(--red); }
 .fiche summary::after { content: ""; grid-column: 2; grid-row: 1 / span 2; width: 9px; height: 9px; margin: 0 4px 4px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); }
 .fiche[open] summary::after { transform: rotate(-135deg); margin: 6px 4px 0; }
 .factions { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 14px 12px; }
-.factions .btn.small { min-height: 40px; padding: 8px 14px; }
+.factions .btn.small { flex: 1 1 auto; justify-content: center; min-height: 40px; padding: 8px 10px; font-size: 15px; white-space: nowrap; }
 .points { list-style: none; margin: 0; padding: 0 14px 4px; }
 .points li { border-top: 1px solid var(--line); padding: 10px 0; }
 .points li.missed { border-left: 3px solid var(--red); padding-left: 10px; }
@@ -200,6 +200,20 @@ footer.foot .warn { color: var(--red); }
 .points .a { color: var(--green); font-weight: 500; margin: 0 0 4px; }
 .points .e { font-size: 14px; color: var(--muted); margin: 0; }
 .fb .linkbtn { color: var(--accent); font-weight: 600; text-decoration: none; padding: 6px 0 0; min-height: 36px; }
+.fblinks { display: flex; flex-wrap: wrap; column-gap: 20px; }
+
+/* Document officiel : une image par page, plus large sur grand écran */
+.wrap.wide { max-width: 900px; }
+.docall { width: 100%; margin-top: 12px; }
+.doc-t { font-size: 26px; margin-top: 8px; }
+.pages { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+.page { margin: 0; }
+.page img { display: block; width: 100%; height: auto; background: #fff; border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 1px 2px rgba(14,42,59,.06), 0 6px 18px rgba(14,42,59,.08); }
+.page figcaption { text-align: center; font-family: var(--f-mono); font-size: 12px; color: var(--muted); margin-top: 6px; }
+.docnav { margin-top: 18px; }
+a.linkbtn { display: inline-flex; align-items: center; }
+.zoomhint { margin-top: 6px; }
+@media (pointer: fine) { .zoomhint { display: none; } }
 </style>
 </head>
 <body>
@@ -406,6 +420,11 @@ const RAW = [
     "05FT07": "Dégagement d'urgence", "05FT08": "Extraction d'une victime traumatisée", "06AC01": "Informations générales",
     "07AC01": "Obligations pour les formations"
   };
+  // Document officiel (RTN SSA, DGSCGC, édition septembre 2026) : une image par page dans rtn/pages,
+  // et les pages de chaque fiche. Généré par outils/pages_rtn.py.
+  var PDF_URL = "rtn/references-techniques-nationales-ssa.pdf";
+  var PDF_PAGES = 89;
+  var PAGES = {"01AC01":[6,7],"01AC02":[8,12],"01AC03":[13,16],"01AC04":[17,23],"01AC05":[24,26],"01AC06":[27,30],"01PR01":[31,31],"02AC01":[33,35],"02AC02":[36,38],"02AC03":[39,39],"02AC04":[40,40],"02AC05":[41,43],"03AC01":[45,45],"03PR01":[46,46],"04AC01":[48,54],"04AC02":[55,57],"04AC03":[58,58],"05AC01":[60,60],"05AC02":[61,62],"05AC03":[63,63],"05PR01":[64,66],"05FT01":[67,69],"05FT02":[70,70],"05AC04":[71,72],"05FT03":[73,73],"05FT04":[74,75],"05FT05":[76,77],"05FT06":[78,78],"05FT07":[79,80],"05FT08":[81,82],"06AC01":[84,85],"07AC01":[87,88]};
 
   function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; } return (h >>> 0).toString(36); }
   var QS = RAW.map(function (r) { return { id: hash(r[2]), ch: r[0], f: r[1], q: r[2], o: [r[3], r[4], r[5], r[6]], e: r[7] }; });
@@ -416,6 +435,8 @@ const RAW = [
   var S = { box: {}, missed: {}, session: null };
   var stored = true; // false si le navigateur refuse d'écrire (navigation privée, stockage bloqué)
   var view = "home";
+  // Le document officiel s'affiche plus large que le reste sur grand écran
+  function setView(v) { view = v; document.querySelector(".wrap").classList.toggle("wide", v === "doc"); }
 
   function obj(o) { return o && typeof o === "object" && !Array.isArray(o) ? o : {}; }
   // Remet au propre un état lu (stockage ou fichier) : ignore les questions disparues et les valeurs invalides
@@ -493,7 +514,7 @@ const RAW = [
 
   /* ---- Accueil ---- */
   function renderHome(keepScroll) {
-    view = "home";
+    setView("home");
     var all = pct(QS), seen = Object.keys(S.box).length, missedN = Object.keys(S.missed).length;
     var done = QS.filter(function (q) { return mastered(q.id); }).length;
     var h = '<header class="top"><div><h1>Révision SSA</h1><div class="sub">Références techniques nationales · édition septembre 2026</div></div></header><div class="stack">';
@@ -509,7 +530,7 @@ const RAW = [
       '<button class="btn-inv" data-act="quick">Lancer</button></div>';
     h += '<div class="grid2"><button class="btn" data-act="exam">Examen blanc<small>30 questions, tous chapitres</small></button>' +
       '<button class="btn" data-act="errors"' + (missedN ? '' : ' disabled') + '>Mes erreurs<small>' + (missedN ? missedN + ' à revoir' : 'aucune pour l\'instant') + '</small></button></div>';
-    h += '<button class="btn" data-act="read">Fiches de révision<small>' + (canSpeak ? 'Lire ou écouter' : 'Lire') + ' les points clés, fiche par fiche</small></button>';
+    h += '<button class="btn" data-act="read">Fiches de révision<small>Points clés ' + (canSpeak ? 'à lire ou à écouter' : 'à lire') + ', et fiches officielles en PDF</small></button>';
     h += '<div class="label">Par chapitre · ' + QS.length + ' questions · ' + seen + ' déjà vues</div>';
     CH.forEach(function (c) {
       var list = QS.filter(function (q) { return q.ch === c.n; }), p = pct(list);
@@ -534,7 +555,7 @@ const RAW = [
       if (s.res.length >= s.ids.length) return renderResult();
       s.i = s.res.length; save();
     }
-    view = "quiz";
+    setView("quiz");
     var q = BY[s.ids[s.i]];
     cur = { order: shuffle([0, 1, 2, 3]), picked: null, q: q };
     var segs = s.ids.map(function (id, k) {
@@ -572,7 +593,8 @@ const RAW = [
       '<div class="fb ' + (ok ? 'good' : 'bad') + '"><h3>' + flag(ok ? 'var(--green)' : 'var(--red)') + (ok ? 'Bonne réponse' : 'À revoir') + '</h3>' +
       (ok ? '' : '<p><b>Réponse attendue :</b> ' + esc(q.o[0]) + '</p>') +
       '<p>' + esc(q.e) + '</p><div class="ref"><span class="chip">' + esc(q.f) + '</span>' + esc(fiche) + '</div>' +
-      '<button class="linkbtn" data-act="readf" data-f="' + esc(q.f) + '">Lire la fiche →</button></div>';
+      '<div class="fblinks"><button class="linkbtn" data-act="readf" data-f="' + esc(q.f) + '">Lire la fiche →</button>' +
+      (PAGES[q.f] ? '<button class="linkbtn" data-act="doc" data-f="' + esc(q.f) + '">Fiche PDF →</button>' : '') + '</div></div>';
     var bt = document.getElementById("bottom");
     bt.hidden = false;
     bt.innerHTML = '<button class="next" id="next">' + (last ? 'Voir le résultat' : 'Question suivante') + '</button><div class="hint">Raccourcis : A–D ou 1–4 pour répondre, Entrée pour continuer</div>';
@@ -591,7 +613,7 @@ const RAW = [
 
   function renderResult() {
     var s = S.session; if (!s) return renderHome();
-    view = "result";
+    setView("result");
     var good = s.res.filter(Boolean).length, n = s.ids.length, r = good / n;
     var color = r >= 0.8 ? 'green' : r >= 0.5 ? 'yellow' : 'red';
     var word = r >= 0.8 ? 'Drapeau vert' : r >= 0.5 ? 'Drapeau jaune' : 'Drapeau rouge';
@@ -625,7 +647,7 @@ const RAW = [
 
   function renderRead() {
     stopVoice();
-    view = "read";
+    setView("read");
     var single = rd.only && rd.only.length === 1, anyMissed = false;
     var h = '<div class="qtop"><button class="linkbtn" data-act="' + (rd.back === "quiz" ? 'resume' : 'home') + '">← ' + (rd.back === "quiz" ? 'Retour à la session' : 'Accueil') + '</button></div>' +
       '<h2 class="rtitle">' + (single ? 'Fiche à relire' : rd.only ? 'Fiches à revoir' : 'Fiches de révision') + '</h2>';
@@ -637,23 +659,62 @@ const RAW = [
       body += '<div class="label">Chapitre ' + c.n + ' · ' + esc(c.t) + '</div>';
       codes.forEach(function (f) {
         var list = QS.filter(function (q) { return q.f === f; }), m = list.filter(function (q) { return mastered(q.id); }).length;
-        body += '<details class="fiche"' + (rd.only ? ' open' : '') + '><summary><span class="fmeta"><span class="chip">' + esc(f) + '</span>' + m + ' / ' + list.length + ' maîtrisée' + (list.length > 1 ? 's' : '') + '</span><b>' + esc(FICHES[f] || f) + '</b></summary>' +
+        body += '<details class="fiche" data-f="' + esc(f) + '"' + (rd.only ? ' open' : '') + '><summary><span class="fmeta"><span class="chip">' + esc(f) + '</span>' + m + ' / ' + list.length + ' maîtrisée' + (list.length > 1 ? 's' : '') + '</span><b>' + esc(FICHES[f] || f) + '</b></summary>' +
           '<div class="factions">' + (canSpeak ? '<button class="btn small" data-act="listen" data-f="' + esc(f) + '" aria-pressed="false">▶ Écouter</button>' : '') +
-          '<button class="btn small" data-act="ficheq" data-f="' + esc(f) + '">S\'entraîner · ' + list.length + '</button></div><ol class="points">' +
+          '<button class="btn small" data-act="ficheq" data-f="' + esc(f) + '">S\'entraîner</button>' +
+          (PAGES[f] ? '<button class="btn small" data-act="doc" data-f="' + esc(f) + '" aria-label="Fiche officielle en PDF">PDF</button>' : '') + '</div><ol class="points">' +
           list.map(function (q) {
             if (S.missed[q.id]) anyMissed = true;
             return '<li data-id="' + q.id + '"' + (S.missed[q.id] ? ' class="missed"' : '') + '><p class="q">' + esc(q.q) + '</p><p class="a">' + esc(q.o[0]) + '</p><p class="e">' + esc(q.e) + '</p></li>';
           }).join('') + '</ol></details>';
       });
     });
-    var sub = rd.redo ? 'D\'après les erreurs de ta session.' : rd.only ? '' : 'Les points clés de chaque fiche. Ouvre une fiche pour la ' + (canSpeak ? 'lire ou l\'écouter.' : 'lire.');
+    var sub = rd.redo ? 'D\'après les erreurs de ta session.' : rd.only ? '' : 'Les points clés de chaque fiche. Ouvre une fiche pour la ' + (canSpeak ? 'lire, l\'écouter' : 'lire') + ' ou voir la fiche officielle en PDF.';
     if (anyMissed) sub += (sub ? ' ' : '') + 'En rouge : tes erreurs.';
     if (sub) h += '<p class="rsub">' + sub + '</p>';
+    if (!rd.only) h += '<button class="btn docall" data-act="docall">Document officiel complet<small>Références techniques nationales SSA · ' + PDF_PAGES + ' pages</small></button>';
     h += body;
     if (rd.redo && lastWrong.length) h += '<div class="bottom"><button class="next" data-act="redo">Refaire mes erreurs · ' + lastWrong.length + '</button></div>';
     if (rd.only) h += '<button class="linkbtn" data-act="read">Voir toutes les fiches</button>';
     app.innerHTML = h;
     window.scrollTo(0, 0);
+  }
+
+  /* ---- Document officiel : pages de la fiche (ou du document entier) en images ---- */
+  var dv = { f: null, from: "home" };
+  var DOC_ORDER = Object.keys(PAGES);
+  function openDoc(f) { dv = { f: f, from: view === "doc" ? dv.from : view }; renderDoc(); }
+  function renderDoc() {
+    setView("doc");
+    var f = dv.f, r = f ? PAGES[f] : [1, PDF_PAGES], i = DOC_ORDER.indexOf(f);
+    var back = { quiz: 'Retour à la session', read: 'Fiches', result: 'Accueil', home: 'Accueil' }[dv.from] || 'Accueil';
+    var h = '<div class="qtop"><button class="linkbtn" data-act="docback">← ' + back + '</button><span class="count">' +
+      (f ? 'p. ' + r[0] + (r[1] > r[0] ? '–' + r[1] : '') : PDF_PAGES + ' pages') + '</span></div>' +
+      (f ? '<span class="chip">' + esc(f) + '</span><h2 class="rtitle doc-t">' + esc(FICHES[f] || f) + '</h2>'
+         : '<h2 class="rtitle">Document officiel</h2><p class="rsub">Références techniques nationales SSA · DGSCGC · édition septembre 2026</p>') +
+      '<p class="rsub zoomhint">Écarte deux doigts sur une page pour zoomer.</p><div class="pages">';
+    for (var n = r[0]; n <= r[1]; n++) {
+      h += '<figure class="page"><img src="rtn/pages/p' + (n < 10 ? '0' : '') + n + '.webp" width="1240" height="1754" alt="Page ' + n + ' du document officiel"' +
+        (n - r[0] > 1 ? ' loading="lazy"' : '') + ' decoding="async"><figcaption>Page ' + n + '</figcaption></figure>';
+    }
+    h += '</div>';
+    if (f) {
+      var prev = DOC_ORDER[i - 1], nextF = DOC_ORDER[i + 1];
+      h += '<div class="grid2 docnav">' +
+        (prev ? '<button class="btn" data-act="doc" data-f="' + prev + '">← Fiche précédente<small>' + prev + ' · ' + esc(FICHES[prev] || '') + '</small></button>' : '<span></span>') +
+        (nextF ? '<button class="btn" data-act="doc" data-f="' + nextF + '">Fiche suivante →<small>' + nextF + ' · ' + esc(FICHES[nextF] || '') + '</small></button>' : '<span></span>') + '</div>';
+    }
+    h += '<a class="linkbtn" href="' + PDF_URL + '" target="_blank" rel="noopener">Ouvrir le PDF original (' + PDF_PAGES + ' pages)</a>';
+    app.innerHTML = h;
+    window.scrollTo(0, 0);
+  }
+  function closeDoc() {
+    var f = dv.f;
+    if (dv.from === "quiz") return renderQuiz();
+    if (dv.from !== "read") return renderHome();
+    renderRead();
+    var d = f && app.querySelector('details.fiche[data-f="' + f + '"]');
+    if (d) { d.open = true; d.scrollIntoView({ block: "start" }); }
   }
 
   // Écoute : synthèse vocale du navigateur, un point à la fois, en surlignant celui qui est lu
@@ -709,6 +770,9 @@ const RAW = [
     else if (a === "readf") openRead([f], view === "quiz" ? "quiz" : "home");
     else if (a === "readwrong") openRead(ficheCodes(lastWrong), "home", true);
     else if (a === "listen") listen(f);
+    else if (a === "doc") openDoc(f);
+    else if (a === "docall") openDoc(null);
+    else if (a === "docback") closeDoc();
     else if (a === "ficheq") start("fiche", "Fiche " + f, shuffle(QS.filter(function (q) { return q.f === f; }).map(function (q) { return q.id; })));
     else if (a === "exam") start("exam", "Examen blanc", pickExam(30));
     else if (a === "errors") { var ids = Object.keys(S.missed); start("errors", "Mes erreurs", pickPriority(ids.map(function (i) { return BY[i]; }), Math.min(ids.length, 15))); }
